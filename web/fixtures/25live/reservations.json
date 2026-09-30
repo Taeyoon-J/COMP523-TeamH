@@ -1,0 +1,192 @@
+[
+  {
+    "reservation_id": "R-1001",
+    "event_name": "COMP 110-001: Introduction to Programming",
+    "subject": "COMP",
+    "catalog_number": "110",
+    "section": "001",
+    "title": "Introduction to Programming",
+    "instructor": "Instructor A",
+    "expected_head_count": 110,
+    "space_id": 102,
+    "meeting_pattern": {
+      "days": "MWF",
+      "start_time": "09:05",
+      "end_time": "09:55"
+    },
+    "term_code": "2026FA",
+    "start_date": "2026-08-18",
+    "end_date": "2026-12-08"
+  },
+  {
+    "reservation_id": "R-1002",
+    "event_name": "COMP 210-001: Data Structures and Analysis",
+    "subject": "COMP",
+    "catalog_number": "210",
+    "section": "001",
+    "title": "Data Structures and Analysis",
+    "instructor": "Instructor B",
+    "expected_head_count": 75,
+    "space_id": 203,
+    "meeting_pattern": {
+      "days": "TR",
+      "start_time": "11:00",
+      "end_time": "12:15"
+    },
+    "term_code": "2026FA",
+    "start_date": "2026-08-18",
+    "end_date": "2026-12-08"
+  },
+  {
+    "reservation_id": "R-1003",
+    "event_name": "COMP 211-001: Systems Fundamentals",
+    "subject": "COMP",
+    "catalog_number": "211",
+    "section": "001",
+    "title": "Systems Fundamentals",
+    "instructor": "Instructor C",
+    "expected_head_count": 70,
+    "space_id": 203,
+    "meeting_pattern": {
+      "days": "MWF",
+      "start_time": "10:10",
+      "end_time": "11:00"
+    },
+    "term_code": "2026FA",
+    "start_date": "2026-08-18",
+    "end_date": "2026-12-08"
+  },
+  {
+    "reservation_id": "R-1004",
+    "event_name": "COMP 301-001: Foundations of Programming",
+    "subject": "COMP",
+    "catalog_number": "301",
+    "section": "001",
+    "title": "Foundations of Programming",
+    "instructor": "Instructor D",
+    "expected_head_count": 55,
+    "space_id": 101,
+    "meeting_pattern": {
+      "days": "MW",
+      "start_time": "13:25",
+      "end_time": "14:40"
+    },
+    "term_code": "2026FA",
+    "start_date": "2026-08-18",
+    "end_date": "2026-12-08"
+  },
+  {
+    "reservation_id": "R-1005",
+    "event_name": "COMP 421-001: Files and Databases",
+    "subject": "COMP",
+    "catalog_number": "421",
+    "section": "001",
+    "title": "Files and Databases",
+    "instructor": "Instructor E",
+    "expected_head_count": 48,
+    "space_id": 202,
+    "meeting_pattern": {
+      "days": "TR",
+      "start_time": "14:00",
+      "end_time": "15:15"
+    },
+    "term_code": "2026FA",
+    "start_date": "2026-08-18",
+    "end_date": "2026-12-08"
+  },
+  {
+    "reservation_id": "R-1006",
+    "event_name": "COMP 455-001: Models of Languages and Computation",
+    "subject": "COMP",
+    "catalog_number": "455",
+    "section": "001",
+    "title": "Models of Languages and Computation",
+    "instructor": "Instructor F",
+    "expected_head_count": 45,
+    "space_id": 201,
+    "meeting_pattern": {
+      "days": "TR",
+      "start_time": "09:30",
+      "end_time": "10:45"
+    },
+    "term_code": "2026FA",
+    "start_date": "2026-08-18",
+    "end_date": "2026-12-08"
+  },
+  {
+    "reservation_id": "R-1007",
+    "event_name": "COMP 523-001: Software Engineering Laboratory",
+    "subject": "COMP",
+    "catalog_number": "523",
+    "section": "001",
+    "title": "Software Engineering Laboratory",
+    "instructor": "Instructor G",
+    "expected_head_count": 40,
+    "space_id": 101,
+    "meeting_pattern": {
+      "days": "TR",
+      "start_time": "15:30",
+      "end_time": "16:45"
+    },
+    "term_code": "2026FA",
+    "start_date": "2026-08-18",
+    "end_date": "2026-12-08"
+  },
+  {
+    "reservation_id": "R-1008",
+    "event_name": "COMP 550-001: Algorithms and Analysis",
+    "subject": "COMP",
+    "catalog_number": "550",
+    "section": "001",
+    "title": "Algorithms and Analysis",
+    "instructor": "Instructor H",
+    "expected_head_count": 50,
+    "space_id": 101,
+    "meeting_pattern": {
+      "days": "WF",
+      "start_time": "14:00",
+      "end_time": "15:15"
+    },
+    "term_code": "2026FA",
+    "start_date": "2026-08-18",
+    "end_date": "2026-12-08"
+  },
+  {
+    "reservation_id": "R-1009",
+    "event_name": "COMP 590-140: Special Topics: Human-Centered Computing",
+    "subject": "COMP",
+    "catalog_number": "590",
+    "section": "140",
+    "title": "Special Topics: Human-Centered Computing",
+    "instructor": "Instructor I",
+    "expected_head_count": 20,
+    "space_id": 103,
+    "meeting_pattern": {
+      "days": "MW",
+      "start_time": "16:40",
+      "end_time": "17:55"
+    },
+    "term_code": "2026FA",
+    "start_date": "2026-08-18",
+    "end_date": "2026-12-08"
+  },
+  {
+    "reservation_id": "R-1010",
+    "event_name": "COMP 560-001: Artificial Intelligence",
+    "subject": "COMP",
+    "catalog_number": "560",
+    "section": "001",
+    "title": "Artificial Intelligence",
+    "instructor": "Instructor J",
+    "expected_head_count": 65,
+    "space_id": null,
+    "meeting_pattern": {
+      "days": "TR",
+      "start_time": "12:30",
+      "end_time": "13:45"
+    },
+    "term_code": "2026FA",
+    "start_date": "2026-08-18",
+    "end_date": "2026-12-08"
+  }
+]

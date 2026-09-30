@@ -1,0 +1,46 @@
+{
+  "name": "comp523-scheduling",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "db:up": "docker compose up -d",
+    "db:migrate": "prisma migrate dev",
+    "db:seed": "prisma db seed",
+    "db:studio": "prisma studio",
+    "postinstall": "prisma generate",
+    "cli": "tsx src/cli/index.ts"
+  },
+  "dependencies": {
+    "@fullcalendar/react": "^7.1.0",
+    "@prisma/client": "^6.19.3",
+    "googleapis": "^182.0.0",
+    "next": "16.3.6",
+    "next-auth": "^5.0.0-beta.32",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "temporal-polyfill": "^1.0.5",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.3.6",
+    "prisma": "^6.19.3",
+    "tailwindcss": "^4",
+    "tsx": "^4.23.15",
+    "typescript": "^5",
+    "vitest": "^3.2.7"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  }
+}

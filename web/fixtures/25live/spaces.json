@@ -1,0 +1,8 @@
+[
+  { "space_id": 101, "space_name": "SN011", "building_name": "Sitterson Hall", "max_capacity": 60 },
+  { "space_id": 102, "space_name": "SN014", "building_name": "Sitterson Hall", "max_capacity": 120 },
+  { "space_id": 103, "space_name": "SN115", "building_name": "Sitterson Hall", "max_capacity": 25 },
+  { "space_id": 201, "space_name": "FB007", "building_name": "Brooks Building", "max_capacity": 50 },
+  { "space_id": 202, "space_name": "FB008", "building_name": "Brooks Building", "max_capacity": 21 },
+  { "space_id": 203, "space_name": "FB009", "building_name": "Brooks Building", "max_capacity": 80 }
+]

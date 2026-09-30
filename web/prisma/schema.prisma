@@ -1,0 +1,138 @@
+// Data model for the COMP 523 classroom scheduling system.
+// Docs: https://www.prisma.io/docs/orm/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Weekday {
+  MON
+  TUE
+  WED
+  THU
+  FRI
+  SAT
+  SUN
+}
+
+/// Where a record originally came from (NFR-4: distinguish local vs external data).
+enum DataSource {
+  LOCAL
+  TWENTYFIVE_LIVE
+  GOOGLE_CALENDAR
+}
+
+enum ExternalSystem {
+  TWENTYFIVE_LIVE
+  GOOGLE_CALENDAR
+}
+
+enum SyncStatus {
+  RUNNING
+  SUCCESS
+  FAILED
+}
+
+model Room {
+  id               String    @id @default(cuid())
+  name             String    @unique // e.g. "SN 014"
+  building         String?
+  category         String? // "Classroom", "Conference Room"
+  capacity         Int
+  /// The room's own Google Calendar (the department keeps one calendar per room).
+  googleCalendarId String?          @unique
+  meetings         Meeting[]
+  reservations     RoomReservation[]
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+}
+
+model Course {
+  id                 String    @id @default(cuid())
+  term               String // e.g. "2026FA"
+  code               String // e.g. "COMP 523"
+  section            String // e.g. "001"
+  title              String
+  instructorName     String?
+  instructorEmail    String?
+  expectedEnrollment Int
+  meetings           Meeting[]
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  @@unique([term, code, section])
+}
+
+/// One recurring meeting pattern of a course (e.g. MWF 9:05-9:55 in SN 014).
+model Meeting {
+  id            String      @id @default(cuid())
+  course        Course      @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  courseId      String
+  room          Room?       @relation(fields: [roomId], references: [id], onDelete: SetNull)
+  roomId        String?
+  days          Weekday[]
+  /// Minutes after midnight, local time (e.g. 9:05 -> 545).
+  startMinute   Int
+  endMinute     Int
+  startDate     DateTime    @db.Date
+  endDate       DateTime    @db.Date
+  source        DataSource  @default(LOCAL)
+  externalId    String?     @unique // reservation ID in 25Live, if imported
+  googleEventId String? // recurring event ID on the department Google Calendar
+  lastSyncedAt  DateTime?
+  changes       ChangeLog[]
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([roomId])
+}
+
+/// A non-course booking of a room (seminar, faculty meeting, ...) pulled from Google Calendar.
+/// Counted for availability and conflict checks.
+model RoomReservation {
+  id           String     @id @default(cuid())
+  room         Room       @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  roomId       String
+  title        String
+  days         Weekday[]
+  startMinute  Int
+  endMinute    Int
+  startDate    DateTime   @db.Date
+  endDate      DateTime   @db.Date
+  source       DataSource @default(GOOGLE_CALENDAR)
+  externalId   String // Google Calendar event ID (one event can book several rooms)
+  lastSyncedAt DateTime?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@unique([roomId, externalId])
+  @@index([roomId])
+}
+
+/// FR-13 / NFR-9: history of scheduling changes.
+model ChangeLog {
+  id        String     @id @default(cuid())
+  meeting   Meeting    @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  meetingId String
+  field     String
+  oldValue  String?
+  newValue  String?
+  changedBy String // user email or system name
+  source    DataSource @default(LOCAL)
+  createdAt DateTime   @default(now())
+}
+
+/// I-8: record of each sync with an external system, for "last synced" display.
+model SyncRun {
+  id         String         @id @default(cuid())
+  system     ExternalSystem
+  status     SyncStatus     @default(RUNNING)
+  message    String?
+  startedAt  DateTime       @default(now())
+  finishedAt DateTime?
+}

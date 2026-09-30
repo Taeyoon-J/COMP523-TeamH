@@ -1,0 +1,17 @@
+[
+  { "id": "student@mock.calendar", "summary": "Student Name" },
+  { "id": "en.usa#holiday@group.v.calendar.google.com", "summary": "Holidays in United States" },
+  { "id": "fb007@mock.calendar", "summary": "FB007 seats 50" },
+  { "id": "fb008@mock.calendar", "summary": "FB008 seats 21" },
+  { "id": "fb009@mock.calendar", "summary": "FB009 seats 80 (email for reservation requests)" },
+  { "id": "fb120@mock.calendar", "summary": "FB120 seats 14" },
+  { "id": "fb141@mock.calendar", "summary": "FB141 seats 50" },
+  { "id": "fb152@mock.calendar", "summary": "FB152 seats 8 (Open Meeting Space)" },
+  { "id": "fb220@mock.calendar", "summary": "FB220 seats 12" },
+  { "id": "fb252@mock.calendar", "summary": "FB252 seats 7" },
+  { "id": "sn011@mock.calendar", "summary": "SN011 seats 55 (email for reservation requests)" },
+  { "id": "sn014@mock.calendar", "summary": "SN014 seats 125" },
+  { "id": "sn115@mock.calendar", "summary": "SN115 seats 24" },
+  { "id": "sn282@mock.calendar", "summary": "SN282 seats 10" },
+  { "id": "sn284@mock.calendar", "summary": "SN284 seats 40" }
+]

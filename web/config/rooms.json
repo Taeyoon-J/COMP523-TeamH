@@ -1,0 +1,18 @@
+{
+  "$comment": "Authoritative room list. Capacity here wins over the 'seats N' in a room calendar's name; `pull` warns when they differ.",
+  "rooms": [
+    { "name": "FB007", "capacity": 50, "category": "Classroom" },
+    { "name": "FB008", "capacity": 21, "category": "Classroom" },
+    { "name": "FB009", "capacity": 80, "category": "Classroom" },
+    { "name": "SN011", "capacity": 60, "category": "Classroom" },
+    { "name": "SN014", "capacity": 120, "category": "Classroom" },
+    { "name": "SN115", "capacity": 25, "category": "Classroom" },
+    { "name": "FB120", "capacity": 14, "category": "Conference Room" },
+    { "name": "FB141", "capacity": 50, "category": "Conference Room" },
+    { "name": "FB152", "capacity": 8, "category": "Conference Room" },
+    { "name": "FB220", "capacity": 12, "category": "Conference Room" },
+    { "name": "FB252", "capacity": 7, "category": "Conference Room" },
+    { "name": "SN282", "capacity": 10, "category": "Conference Room" },
+    { "name": "SN284", "capacity": 40, "category": "Conference Room" }
+  ]
+}

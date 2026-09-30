@@ -1,0 +1,14 @@
+{
+  "name": "comp523-teamh",
+  "private": true,
+  "description": "Runs the app in web/ from the repo root. See README.md.",
+  "scripts": {
+    "dev": "npm --prefix web run dev",
+    "cli": "npm --prefix web run cli --",
+    "test": "npm --prefix web test",
+    "lint": "npm --prefix web run lint",
+    "db:up": "npm --prefix web run db:up",
+    "db:seed": "npm --prefix web run db:seed",
+    "db:studio": "npm --prefix web run db:studio"
+  }
+}
