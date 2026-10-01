@@ -32,6 +32,19 @@ npm run dev                  # http://localhost:3000
 
 Other scripts: `npm test`, `npm run lint`, `npm run db:studio` (browse the DB).
 
+## Web app
+
+`npm run dev`, then http://localhost:3000.
+
+- **Find a room**: the search box takes a room name or fragment (`SN014`, `SN`, `FB`, `009`) or a
+  class you need to place (`Wednesday 1:15 min class with capacity at least 50`, `TR at 2pm 40+ seats`).
+  Filters and results open over the schedule while you search. "Free" means free on every matching
+  weekday in the loaded date range, or on one date if you pick one.
+- **Rooms by time**: one day, one row per room (like 25Live's daily availability grid). Click a room
+  for its week, or a booking for its details.
+- **Week calendar**: the same data as a weekly calendar.
+- Bookings that a room declined in Google Calendar (struck through there) are not imported.
+
 ## CLI
 
 Everything the app does is also available from the terminal, which is the quickest way to try it
@@ -41,6 +54,8 @@ without Google credentials. Run from `web/`:
 npm run cli -- help
 npm run cli -- refresh                 # rooms + bookings from Google Calendar, courses from 25Live
 npm run cli -- rooms                   # rooms, seats, linked calendars
+npm run cli -- search FB               # rooms by name: SN014, SN, FB, 009, "fred brooks", "classroom"
+npm run cli -- search "Wednesday 1:15 min class with capacity at least 50"
 npm run cli -- problems                # conflicts, rooms too small, courses with no room
 npm run cli -- schedule --day TR       # also --room "SN 011", --course COMP523
 npm run cli -- availability --day TR --start 14:00 --end 15:15 --min-capacity 45

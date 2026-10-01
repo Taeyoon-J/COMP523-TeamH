@@ -6,7 +6,7 @@ import { loginWithBrowser, mockCalendarPath, tokenPath } from "@/integrations/go
 import { calendarWritesEnabled } from "@/integrations/google-calendar/oauth";
 import { twentyFiveLiveEnabled } from "@/integrations/twentyfive-live";
 import { integrationMode } from "@/integrations/types";
-import { eventToSlot, managedKey } from "@/lib/calendar-events";
+import { eventToSlot, managedKey, roomResponse } from "@/lib/calendar-events";
 import { prisma } from "@/lib/prisma";
 import { getSchedule } from "@/lib/schedule-data";
 import {
@@ -19,6 +19,8 @@ import {
   WEEKDAYS,
   weekdayOf,
 } from "@/lib/scheduling";
+import { buildingName, describeQuery, describeWindows, hasTimeQuery, matchesRoom, parseSearch, roomAvailability } from "@/lib/room-search";
+import { loadOccupants } from "@/services/occupancy";
 import { assignMeeting, type AssignmentChanges, type AssignmentResult } from "@/services/assignments";
 import { findAvailableRooms, termDates } from "@/services/availability";
 import { ServiceError } from "@/services/errors";
@@ -58,6 +60,8 @@ ${bold("Data sources")} ${dim("(dummy data by default — see GOOGLE_CALENDAR_MO
 
 ${bold("Schedule")}
   rooms                     Rooms, seats, and linked calendars
+  search "<text>"           Find rooms by name or by the class you need, e.g.
+                            search FB · search "Wednesday 1:15 min class with capacity at least 50"
   schedule [--room R] [--day D] [--course C]
   problems                  Room conflicts, capacity issues, unassigned courses
   availability --day D --start T --end T [--date YYYY-MM-DD] [--min-capacity N]
@@ -116,6 +120,7 @@ const commands: Record<string, (args: string[], opts: Options) => Promise<void>>
         dim(`(${toDateString(r.window.from)} – ${toDateString(r.window.to)})`),
     );
     console.log(dim("  " + r.perRoom.map((p) => `${p.room} ${p.count}`).join(" · ")));
+    if (r.declined) console.log(dim(`  Left out ${r.declined} bookings the room declined (struck through in Google Calendar)`));
     printRoomWarnings(r.rooms);
     const skipped = [...new Set(r.skipped.map((s) => s.title))];
     if (skipped.length) console.log(dim(`  Skipped ${r.skipped.length} all-day/multi-day events: ${skipped.slice(0, 5).join(", ")}${skipped.length > 5 ? ", …" : ""}`));
@@ -166,6 +171,43 @@ const commands: Record<string, (args: string[], opts: Options) => Promise<void>>
     throw new ServiceError('Use "google login" or "google calendars".');
   },
 
+  async search(args) {
+    const text = args.join(" ");
+    if (!text.trim()) throw new ServiceError('Say what to look for, e.g. search SN014 or search "TR at 2pm 40+ seats".');
+    const query = parseSearch(text);
+    const [rooms, occupants, dates] = await Promise.all([prisma.room.findMany(), loadOccupants(), termDates()]);
+    const range = { from: toDateString(new Date()), to: toDateString(dates.endDate) };
+    const busy = (room: string) =>
+      occupants
+        .filter((o) => o.roomId === rooms.find((r) => r.name === room)?.id)
+        .map((o) => ({ ...o, startDate: toDateString(o.startDate), endDate: toDateString(o.endDate) }));
+    const results = rooms
+      .filter((r) => matchesRoom(r, query))
+      .map((room) => ({ room, a: roomAvailability(busy(room.name), query, range) }))
+      .sort((x, y) => Number(y.a?.fits ?? true) - Number(x.a?.fits ?? true) || x.room.capacity - y.room.capacity);
+
+    console.log(heading(describeQuery(query, query.date ? undefined : range.to)));
+    console.log(
+      table(
+        ["Room", "Building", "Type", "Seats", ...(hasTimeQuery(query) ? ["Availability"] : [])],
+        results.map(({ room, a }) => [
+          room.name,
+          buildingName(room.name) ?? "—",
+          room.category ?? "—",
+          String(room.capacity),
+          ...(a
+            ? [
+                a.fits
+                  ? green(query.startMinute !== null ? "free" : `free ${describeWindows(a.freeWindows.slice(0, 4))}${a.freeWindows.length > 4 ? ", …" : ""}`)
+                  : red(a.blockers.length ? `busy: ${a.blockers.slice(0, 3).join(", ")}` : `no free ${query.duration ?? 30}-minute window`),
+              ]
+            : []),
+        ]),
+      ),
+    );
+    if (hasTimeQuery(query) && !query.date) console.log(dim(`\n  "Free" means free on every matching day from ${range.from} to ${range.to}.`));
+  },
+
   async rooms() {
     const rooms = await prisma.room.findMany({ orderBy: [{ category: "asc" }, { name: "asc" }], include: { _count: { select: { meetings: true, reservations: true } } } });
     console.log(heading("Rooms"));
@@ -208,11 +250,18 @@ const commands: Record<string, (args: string[], opts: Options) => Promise<void>>
 
     const window = opts.from || opts.to ? readWindow(opts) : thisWeek();
     const { mode, perRoom } = await listCalendarEvents({ room: opts.room ? normalizeRoomName(opts.room) : undefined, window });
+    const roomCalendarIds = new Map((await prisma.room.findMany()).map((r) => [r.name, r.googleCalendarId]));
     console.log(heading(`Room calendar events, ${toDateString(window.from)} – ${toDateString(window.to)} (${mode})`));
     const rows = perRoom.flatMap(({ room, events }) =>
-      events.map((e) => [room, e.summary ?? "(untitled)", describeWhen(e), managedKey(e) ? "this app" : dim("other")]),
+      events.map((e) => [
+        room,
+        e.summary ?? "(untitled)",
+        describeWhen(e),
+        managedKey(e) ? "this app" : dim("other"),
+        roomCalendarIds.get(room) && roomResponse(e, roomCalendarIds.get(room)!) === "declined" ? yellow("declined") : "",
+      ]),
     );
-    console.log(table(["Room", "Title", "When", "Created by"], rows));
+    console.log(table(["Room", "Title", "When", "Created by", "Room response"], rows));
     if (mode === "mock") console.log(dim(`\n  Mock calendar state: ${mockCalendarPath()}`));
   },
 

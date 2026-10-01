@@ -106,3 +106,27 @@ function localDateTime(date: Date, minute: number): string {
   const mm = String(minute % 60).padStart(2, "0");
   return `${toDateString(date)}T${hh}:${mm}:00`;
 }
+
+/** Event descriptions are HTML; keep the text and line breaks. */
+export function htmlToText(html: string | null | undefined): string | null {
+  if (!html) return null;
+  const text = html
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<\/(p|div|li)>/gi, "\n")
+    .replace(/<[^>]+>/g, "")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+  return text || null;
+}
+
+/** How the room itself answered the invitation. Room calendars mark bookings they turned down as "declined". */
+export function roomResponse(event: CalendarEvent, roomCalendarId: string): string | null {
+  const room = event.attendees?.find((a) => a.self || a.email === roomCalendarId);
+  return room?.responseStatus ?? null;
+}

@@ -4,7 +4,16 @@
 //   diff: report where the calendars disagree with the schedule
 import type { Prisma, Room } from "@prisma/client";
 import { getCalendarClient, type CalendarClient } from "@/integrations/google-calendar";
-import { eventDifferences, eventToSlot, managedKey, meetingToEvent, type CalendarEvent, type EventMeeting } from "@/lib/calendar-events";
+import {
+  eventDifferences,
+  eventToSlot,
+  htmlToText,
+  managedKey,
+  meetingToEvent,
+  roomResponse,
+  type CalendarEvent,
+  type EventMeeting,
+} from "@/lib/calendar-events";
 import { prisma } from "@/lib/prisma";
 import { configuredRooms, parseRoomCalendarName } from "@/lib/rooms";
 import { ServiceError } from "./errors";
@@ -71,6 +80,8 @@ export interface PullResult {
   rooms: RoomSyncResult;
   window: { from: Date; to: Date };
   reservations: number;
+  /** Bookings the room turned down (shown struck through in Google Calendar); not imported. */
+  declined: number;
   perRoom: { room: string; count: number }[];
   /** Managed events (our own course events) are not counted here. */
   skipped: { title: string; reason: string }[];
@@ -84,7 +95,7 @@ export function pullReservationsFromCalendar(window = defaultWindow()): Promise<
     async () => {
       const rooms = await syncRoomsFromCalendars(client);
       const roomRows = await prisma.room.findMany({ where: { googleCalendarId: { not: null } }, orderBy: { name: "asc" } });
-      const result: PullResult = { mode: client.mode, rooms, window, reservations: 0, perRoom: [], skipped: [] };
+      const result: PullResult = { mode: client.mode, rooms, window, reservations: 0, declined: 0, perRoom: [], skipped: [] };
       const rows: Prisma.RoomReservationCreateManyInput[] = [];
       const now = new Date();
 
@@ -97,13 +108,27 @@ export function pullReservationsFromCalendar(window = defaultWindow()): Promise<
         let count = 0;
         for (const event of events) {
           if (managedKey(event) || !event.id || event.status === "cancelled") continue;
+          if (roomResponse(event, room.googleCalendarId!) === "declined") {
+            result.declined++;
+            continue;
+          }
           const title = event.summary ?? "(untitled)";
           const slot = eventToSlot(event);
           if (!slot) {
             result.skipped.push({ title, reason: `${room.name}: all-day or multi-day event` });
             continue;
           }
-          rows.push({ roomId: room.id, title, ...slot, source: "GOOGLE_CALENDAR", externalId: event.id, lastSyncedAt: now });
+          rows.push({
+            roomId: room.id,
+            title,
+            description: htmlToText(event.description)?.slice(0, 4000) ?? null,
+            organizer: event.organizer?.displayName ?? event.organizer?.email ?? event.creator?.email ?? null,
+            htmlLink: event.htmlLink ?? null,
+            ...slot,
+            source: "GOOGLE_CALENDAR",
+            externalId: event.id,
+            lastSyncedAt: now,
+          });
           count++;
         }
         result.perRoom.push({ room: room.name, count });
@@ -117,7 +142,10 @@ export function pullReservationsFromCalendar(window = defaultWindow()): Promise<
       result.reservations = rows.length;
       return result;
     },
-    (r) => ({ ok: true, message: `pull: ${r.rooms.rooms.length} rooms, ${r.reservations} reservations, ${r.skipped.length} skipped` }),
+    (r) => ({
+      ok: true,
+      message: `pull: ${r.rooms.rooms.length} rooms, ${r.reservations} reservations, ${r.declined} declined, ${r.skipped.length} skipped`,
+    }),
   );
 }
 

@@ -5,67 +5,159 @@
     "summary": "COMP 210-001 Data Structures and Analysis",
     "description": "Instructor: Instructor B",
     "location": "SN014",
-    "start": { "dateTime": "2026-08-18T11:00:00", "timeZone": "America/New_York" },
-    "end": { "dateTime": "2026-08-18T12:15:00", "timeZone": "America/New_York" },
-    "recurrence": ["RRULE:FREQ=WEEKLY;BYDAY=TU,TH;UNTIL=20261208T235959Z"],
-    "extendedProperties": { "private": { "managedBy": "comp523-scheduler", "scheduleKey": "R-1002" } }
+    "start": {
+      "dateTime": "2026-08-18T11:00:00",
+      "timeZone": "America/New_York"
+    },
+    "end": {
+      "dateTime": "2026-08-18T12:15:00",
+      "timeZone": "America/New_York"
+    },
+    "recurrence": [
+      "RRULE:FREQ=WEEKLY;BYDAY=TU,TH;UNTIL=20261208T235959Z"
+    ],
+    "extendedProperties": {
+      "private": {
+        "managedBy": "comp523-scheduler",
+        "scheduleKey": "R-1002"
+      }
+    }
   },
   {
     "calendarId": "sn014@mock.calendar",
     "id": "gcal-colloquium",
     "summary": "CS Colloquium: Guest Speaker",
-    "start": { "dateTime": "2026-10-05T09:00:00", "timeZone": "America/New_York" },
-    "end": { "dateTime": "2026-10-05T10:00:00", "timeZone": "America/New_York" }
+    "start": {
+      "dateTime": "2026-10-05T09:00:00",
+      "timeZone": "America/New_York"
+    },
+    "end": {
+      "dateTime": "2026-10-05T10:00:00",
+      "timeZone": "America/New_York"
+    },
+    "description": "Talk by a visiting researcher.<br>Open to all CS students.",
+    "organizer": {
+      "email": "events@mock.calendar",
+      "displayName": "CS Events"
+    },
+    "htmlLink": "https://calendar.google.com/calendar/event?eid=mock-colloquium"
   },
   {
     "calendarId": "fb141@mock.calendar",
     "id": "gcal-faculty-meeting",
     "summary": "Faculty Meeting",
-    "start": { "dateTime": "2026-08-19T15:30:00", "timeZone": "America/New_York" },
-    "end": { "dateTime": "2026-08-19T16:30:00", "timeZone": "America/New_York" },
-    "recurrence": ["RRULE:FREQ=WEEKLY;BYDAY=WE;UNTIL=20261209T235959Z"]
+    "start": {
+      "dateTime": "2026-08-19T15:30:00",
+      "timeZone": "America/New_York"
+    },
+    "end": {
+      "dateTime": "2026-08-19T16:30:00",
+      "timeZone": "America/New_York"
+    },
+    "recurrence": [
+      "RRULE:FREQ=WEEKLY;BYDAY=WE;UNTIL=20261209T235959Z"
+    ]
   },
   {
     "calendarId": "fb120@mock.calendar",
     "id": "gcal-accessibility",
     "summary": "Weekly digital accessibility meeting",
-    "start": { "dateTime": "2026-08-19T10:00:00", "timeZone": "America/New_York" },
-    "end": { "dateTime": "2026-08-19T11:00:00", "timeZone": "America/New_York" },
-    "recurrence": ["RRULE:FREQ=WEEKLY;BYDAY=WE;UNTIL=20261209T235959Z"]
+    "start": {
+      "dateTime": "2026-08-19T10:00:00",
+      "timeZone": "America/New_York"
+    },
+    "end": {
+      "dateTime": "2026-08-19T11:00:00",
+      "timeZone": "America/New_York"
+    },
+    "recurrence": [
+      "RRULE:FREQ=WEEKLY;BYDAY=WE;UNTIL=20261209T235959Z"
+    ]
   },
   {
     "calendarId": "sn115@mock.calendar",
     "id": "gcal-thesis-defense",
     "summary": "PhD Thesis Defense",
-    "start": { "dateTime": "2026-11-12T13:00:00", "timeZone": "America/New_York" },
-    "end": { "dateTime": "2026-11-12T15:00:00", "timeZone": "America/New_York" }
+    "start": {
+      "dateTime": "2026-11-12T13:00:00",
+      "timeZone": "America/New_York"
+    },
+    "end": {
+      "dateTime": "2026-11-12T15:00:00",
+      "timeZone": "America/New_York"
+    }
   },
   {
     "calendarId": "fb220@mock.calendar",
     "id": "gcal-group-a",
     "summary": "Research group meeting",
-    "start": { "dateTime": "2026-10-02T10:45:00", "timeZone": "America/New_York" },
-    "end": { "dateTime": "2026-10-02T12:00:00", "timeZone": "America/New_York" }
+    "start": {
+      "dateTime": "2026-10-02T10:45:00",
+      "timeZone": "America/New_York"
+    },
+    "end": {
+      "dateTime": "2026-10-02T12:00:00",
+      "timeZone": "America/New_York"
+    }
   },
   {
     "calendarId": "fb220@mock.calendar",
     "id": "gcal-group-b",
     "summary": "Student project meeting",
-    "start": { "dateTime": "2026-10-02T11:30:00", "timeZone": "America/New_York" },
-    "end": { "dateTime": "2026-10-02T12:30:00", "timeZone": "America/New_York" }
+    "start": {
+      "dateTime": "2026-10-02T11:30:00",
+      "timeZone": "America/New_York"
+    },
+    "end": {
+      "dateTime": "2026-10-02T12:30:00",
+      "timeZone": "America/New_York"
+    }
   },
   {
     "calendarId": "fb007@mock.calendar",
     "id": "gcal-data-challenge",
     "summary": "Carolina Data Challenge",
-    "start": { "date": "2026-09-27" },
-    "end": { "date": "2026-09-28" }
+    "start": {
+      "date": "2026-09-27"
+    },
+    "end": {
+      "date": "2026-09-28"
+    }
   },
   {
     "calendarId": "en.usa#holiday@group.v.calendar.google.com",
     "id": "gcal-thanksgiving",
     "summary": "Thanksgiving Day",
-    "start": { "date": "2026-11-26" },
-    "end": { "date": "2026-11-27" }
+    "start": {
+      "date": "2026-11-26"
+    },
+    "end": {
+      "date": "2026-11-27"
+    }
+  },
+  {
+    "calendarId": "sn011@mock.calendar",
+    "id": "gcal-declined-review",
+    "summary": "Exam review session (room declined)",
+    "description": "Requested for COMP 301.<br>Declined: room is booked for a class.",
+    "organizer": {
+      "email": "organizer@mock.calendar",
+      "displayName": "Mock Organizer"
+    },
+    "attendees": [
+      {
+        "email": "sn011@mock.calendar",
+        "resource": true,
+        "responseStatus": "declined"
+      }
+    ],
+    "start": {
+      "dateTime": "2026-10-07T14:00:00",
+      "timeZone": "America/New_York"
+    },
+    "end": {
+      "dateTime": "2026-10-07T15:00:00",
+      "timeZone": "America/New_York"
+    }
   }
 ]

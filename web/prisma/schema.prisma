@@ -99,6 +99,9 @@ model RoomReservation {
   room         Room       @relation(fields: [roomId], references: [id], onDelete: Cascade)
   roomId       String
   title        String
+  description  String? // plain text, from the calendar event
+  organizer    String? // who booked it
+  htmlLink     String? // opens the event in Google Calendar
   days         Weekday[]
   startMinute  Int
   endMinute    Int

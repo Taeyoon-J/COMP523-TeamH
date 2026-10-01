@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { eventDifferences, eventToSlot, managedKey, meetingToEvent, type EventMeeting } from "./calendar-events";
+import { eventDifferences, eventToSlot, htmlToText, managedKey, meetingToEvent, roomResponse, type EventMeeting } from "./calendar-events";
 
 const meeting: EventMeeting = {
   key: "R-1002",
@@ -73,5 +73,24 @@ describe("eventDifferences", () => {
 
   it("does not treat events without our marker as managed", () => {
     expect(managedKey({ summary: "Faculty Meeting" })).toBeNull();
+  });
+});
+
+describe("htmlToText", () => {
+  it("keeps text and line breaks from an HTML description", () => {
+    expect(htmlToText("Talk by a visiting researcher.<br>Open to <b>all</b> CS students &amp; staff.")).toBe(
+      "Talk by a visiting researcher.\nOpen to all CS students & staff.",
+    );
+    expect(htmlToText("")).toBeNull();
+    expect(htmlToText(undefined)).toBeNull();
+  });
+});
+
+describe("roomResponse", () => {
+  it("reads how the room answered the booking", () => {
+    const event = { attendees: [{ email: "person@unc.edu", responseStatus: "accepted" }, { email: "fb009@room", responseStatus: "declined" }] };
+    expect(roomResponse(event, "fb009@room")).toBe("declined");
+    expect(roomResponse({ attendees: [{ self: true, responseStatus: "accepted" }] }, "fb009@room")).toBe("accepted");
+    expect(roomResponse({}, "fb009@room")).toBeNull();
   });
 });
