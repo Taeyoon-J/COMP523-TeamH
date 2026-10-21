@@ -130,3 +130,36 @@ export function roomResponse(event: CalendarEvent, roomCalendarId: string): stri
   const room = event.attendees?.find((a) => a.self || a.email === roomCalendarId);
   return room?.responseStatus ?? null;
 }
+
+export interface EventBooking {
+  key: string;
+  title: string;
+  description: string | null;
+  roomName: string;
+  days: Weekday[];
+  startMinute: number;
+  endMinute: number;
+  startDate: Date;
+  endDate: Date;
+}
+
+/** A room booking made in this app, as an event on the room's calendar (weekly if it spans several dates). */
+export function bookingToEvent(b: EventBooking): CalendarEvent {
+  const timeZone = process.env.CALENDAR_TIMEZONE || "America/New_York";
+  const first = firstOccurrence(b.startDate, b.days);
+  const repeats = b.startDate.getTime() !== b.endDate.getTime();
+  return {
+    summary: b.title,
+    location: b.roomName,
+    description: b.description ?? undefined,
+    start: { dateTime: localDateTime(first, b.startMinute), timeZone },
+    end: { dateTime: localDateTime(first, b.endMinute), timeZone },
+    recurrence: repeats
+      ? [`RRULE:FREQ=WEEKLY;BYDAY=${b.days.map((d) => TO_RRULE[d]).join(",")};UNTIL=${toDateString(b.endDate).replace(/-/g, "")}T235959Z`]
+      : undefined,
+    extendedProperties: { private: { managedBy: MANAGED_BY, scheduleKey: b.key } },
+  };
+}
+
+/** Keys of bookings made in this app start with "booking:"; everything else we manage is a course meeting. */
+export const BOOKING_KEY_PREFIX = "booking:";

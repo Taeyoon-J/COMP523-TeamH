@@ -34,6 +34,8 @@ import {
 } from "@/services/google-calendar-sync";
 import { courseLabel } from "@/services/labels";
 import { resetAll } from "@/services/reset";
+import { syncSheet } from "@/services/sheet-sync";
+import { mockSheetPath, sheetsEnabled } from "@/integrations/google-sheets";
 import { importFrom25Live } from "@/services/twentyfive-live-import";
 import { bold, dim, green, heading, red, table, yellow } from "./format";
 
@@ -57,6 +59,8 @@ ${bold("Data sources")} ${dim("(dummy data by default — see GOOGLE_CALENDAR_MO
   push                      Write course meetings to their room calendars
   calendar [--room R]       Events on the room calendars (--from/--to, default: this week)
   calendar diff             Where the calendars disagree with the course schedule
+  sheet push                Rewrite the events spreadsheet from the schedule
+  watch [--every MIN]       Keep pulling from Google Calendar (default every 5 min) and update the spreadsheet
 
 ${bold("Schedule")}
   rooms                     Rooms, seats, and linked calendars
@@ -90,6 +94,8 @@ type Options = {
   end?: string;
   date?: string;
   "min-capacity"?: string;
+  every?: string;
+  quiet?: boolean;
   from?: string;
   to?: string;
   limit?: string;
@@ -111,6 +117,7 @@ const commands: Record<string, (args: string[], opts: Options) => Promise<void>>
     }
     if (r.missing.length) console.log(yellow(`  No longer in 25Live (not deleted): ${r.missing.join(", ")}`));
     for (const e of r.errors) console.log(red(`  Could not import ${e}`));
+    await printSheet(opts.quiet);
   },
 
   async pull(_args, opts) {
@@ -122,6 +129,7 @@ const commands: Record<string, (args: string[], opts: Options) => Promise<void>>
     console.log(dim("  " + r.perRoom.map((p) => `${p.room} ${p.count}`).join(" · ")));
     if (r.declined) console.log(dim(`  Left out ${r.declined} bookings the room declined (struck through in Google Calendar)`));
     printRoomWarnings(r.rooms);
+    await printSheet(opts.quiet);
     const skipped = [...new Set(r.skipped.map((s) => s.title))];
     if (skipped.length) console.log(dim(`  Skipped ${r.skipped.length} all-day/multi-day events: ${skipped.slice(0, 5).join(", ")}${skipped.length > 5 ? ", …" : ""}`));
   },
@@ -131,7 +139,7 @@ const commands: Record<string, (args: string[], opts: Options) => Promise<void>>
     await commands.import(args, opts);
   },
 
-  async push() {
+  async push(_args, opts) {
     const r = await pushAllToCalendar();
     console.log(
       `Google Calendar ${dim(`(${r.mode})`)}: ${r.created.length} created · ${r.updated.length} updated · ${r.moved.length} moved · ${r.unchanged} unchanged`,
@@ -142,6 +150,29 @@ const commands: Record<string, (args: string[], opts: Options) => Promise<void>>
     if (r.removed.length) console.log(`  Removed (no room): ${r.removed.join(", ")}`);
     for (const x of r.skipped) console.log(dim(`  Skipped ${x}`));
     for (const f of r.failures) console.log(red(`  Failed: ${f}`));
+    await printSheet(opts.quiet);
+  },
+
+  async sheet([sub]) {
+    if (sub !== "push") throw new ServiceError('Use "sheet push".');
+    await printSheet(false);
+  },
+
+  async watch(_args, opts) {
+    const minutes = Number(opts.every ?? 5);
+    if (!(minutes >= 1)) throw new ServiceError("--every must be at least 1 (minutes).");
+    console.log(`Pulling from Google Calendar every ${minutes} min. Press Ctrl+C to stop.`);
+    for (;;) {
+      const stamp = new Date().toLocaleTimeString();
+      try {
+        const r = await pullReservationsFromCalendar(readWindow(opts));
+        const sheet = await syncSheet();
+        console.log(`${dim(stamp)} ${r.reservations} bookings · ${(sheet.ok ? dim : yellow)(sheet.message)}`);
+      } catch (err) {
+        console.log(`${dim(stamp)} ${red((err as Error).message)}`);
+      }
+      await new Promise((resolve) => setTimeout(resolve, minutes * 60_000));
+    }
   },
 
   async google([sub]) {
@@ -150,7 +181,8 @@ const commands: Record<string, (args: string[], opts: Options) => Promise<void>>
         console.log(yellow("Note: GOOGLE_CALENDAR_MODE is not \"live\" yet, so other commands will keep using mock data.\n"));
       }
       const { scope } = await loginWithBrowser((line) => console.log(line));
-      console.log(green(`Signed in (${scope.endsWith("readonly") ? "read-only" : "read + write"}). Token saved to ${tokenPath()}`));
+      const access = [scope.includes("calendar.readonly") ? "calendar: read-only" : "calendar: read + write", ...(scope.includes("spreadsheets") ? ["spreadsheet: edit"] : [])];
+      console.log(green(`Signed in (${access.join(", ")}). Token saved to ${tokenPath()}`));
       console.log(`Next: ${bold("npm run cli -- google calendars")}`);
       return;
     }
@@ -416,13 +448,13 @@ const commands: Record<string, (args: string[], opts: Options) => Promise<void>>
     const logs = await prisma.changeLog.findMany({
       take: opts.limit ? Number(opts.limit) : 20,
       orderBy: { createdAt: "desc" },
-      include: { meeting: { include: { course: true } } },
+      include: { meeting: { include: { course: true } }, reservation: { include: { room: true } } },
     });
     console.log(heading("Recent changes"));
     console.log(
       table(
-        ["When", "Course", "Field", "From", "To", "By"],
-        logs.map((l) => [l.createdAt.toLocaleString(), courseLabel(l.meeting.course), l.field, l.oldValue ?? "", l.newValue ?? "", dim(l.changedBy)]),
+        ["When", "Course / booking", "Field", "From", "To", "By"],
+        logs.map((l) => [l.createdAt.toLocaleString(), l.meeting ? courseLabel(l.meeting.course) : `${l.reservation?.title ?? "?"} (${l.reservation?.room.name ?? "?"})`, l.field, l.oldValue ?? "", l.newValue ?? "", dim(l.changedBy)]),
       ),
     );
   },
@@ -443,6 +475,7 @@ const commands: Record<string, (args: string[], opts: Options) => Promise<void>>
       `  Google Calendar  ${googleMode}` +
         (googleMode === "live" ? ` · ${signedIn ? green("signed in") : red("not signed in")} · writes ${calendarWritesEnabled() ? yellow("ON") : "off"}` : ""),
     );
+    console.log(`  Spreadsheet      ${integrationMode("SHEETS_MODE")}${integrationMode("SHEETS_MODE") === "mock" ? dim(` (${mockSheetPath()})`) : integrationMode("SHEETS_MODE") === "live" ? dim(` (${process.env.GOOGLE_SHEET_ID ?? "GOOGLE_SHEET_ID not set"})`) : ""}`);
     console.log(heading("Local database"));
     console.log(`  ${rooms} rooms · ${courses} courses · ${meetings} meetings · ${reservations} room reservations`);
     console.log(heading("Last sync"));
@@ -460,6 +493,12 @@ const commands: Record<string, (args: string[], opts: Options) => Promise<void>>
     console.log(`Cleared. Run ${bold("npm run cli -- refresh")} to load the dummy data again.`);
   },
 };
+
+async function printSheet(quiet?: boolean) {
+  if (!sheetsEnabled()) return;
+  const r = await syncSheet();
+  if (!quiet || !r.ok) console.log((r.ok ? dim : yellow)(`  ${r.message}`));
+}
 
 function readDate(value: string, flag: string): Date {
   const date = new Date(`${value}T00:00:00Z`);
@@ -549,6 +588,8 @@ async function main() {
       end: { type: "string" },
       date: { type: "string" },
       "min-capacity": { type: "string" },
+      every: { type: "string" },
+      quiet: { type: "boolean" },
       from: { type: "string" },
       to: { type: "string" },
       limit: { type: "string" },

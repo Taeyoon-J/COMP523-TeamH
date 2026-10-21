@@ -12,7 +12,7 @@ import type { CalendarClient } from "./types";
 type StoredEvent = CalendarEvent & { calendarId: string };
 
 export function mockCalendarPath(): string {
-  return path.join(process.cwd(), process.env.MOCK_DATA_DIR || ".mock-data", "google-calendar.json");
+  return path.resolve(process.cwd(), process.env.MOCK_DATA_DIR || ".mock-data", "google-calendar.json");
 }
 
 export function resetMockCalendar(): void {

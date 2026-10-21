@@ -16,8 +16,18 @@ export function isAdmin(email: string | null | undefined): boolean {
   return admins.includes(email.toLowerCase());
 }
 
+/**
+ * Local development only: AUTH_DEV_ADMIN="you@unc.edu" acts as that admin without signing in,
+ * until Google sign-in is set up. Ignored in production builds.
+ */
+export function devAdmin(): string | null {
+  return process.env.NODE_ENV !== "production" && process.env.AUTH_DEV_ADMIN ? process.env.AUTH_DEV_ADMIN : null;
+}
+
 /** Returns the signed-in admin's email, or null if the caller is not an admin. */
 export async function requireAdmin(): Promise<string | null> {
+  const dev = devAdmin();
+  if (dev) return dev;
   const session = await auth();
   const email = session?.user?.email;
   return isAdmin(email) ? email! : null;

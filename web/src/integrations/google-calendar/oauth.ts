@@ -15,6 +15,7 @@ const REDIRECT_PORT = Number(process.env.GOOGLE_OAUTH_REDIRECT_PORT || 53682);
 
 const READ_SCOPE = "https://www.googleapis.com/auth/calendar.readonly";
 const WRITE_SCOPE = "https://www.googleapis.com/auth/calendar";
+const SHEETS_SCOPE = "https://www.googleapis.com/auth/spreadsheets";
 
 /** Writing to the real calendars is off unless GOOGLE_CALENDAR_WRITE=true (and you log in again). */
 export function calendarWritesEnabled(): boolean {
@@ -58,7 +59,8 @@ export function authorizedClient(): OAuth2Client {
 /** Opens the Google sign-in page and waits for the redirect back to a local port. */
 export async function loginWithBrowser(log: (line: string) => void): Promise<{ scope: string }> {
   const { clientId, clientSecret } = clientCredentials();
-  const scope = calendarWritesEnabled() ? WRITE_SCOPE : READ_SCOPE;
+  const scopes = [calendarWritesEnabled() ? WRITE_SCOPE : READ_SCOPE, ...(process.env.SHEETS_MODE === "live" ? [SHEETS_SCOPE] : [])];
+  const scope = scopes.join(" ");
 
   const server = http.createServer();
   await new Promise<void>((resolve, reject) => {
@@ -69,7 +71,7 @@ export async function loginWithBrowser(log: (line: string) => void): Promise<{ s
   });
   const redirectUri = `http://127.0.0.1:${REDIRECT_PORT}/oauth2callback`;
   const client = new google.auth.OAuth2(clientId, clientSecret, redirectUri);
-  const url = client.generateAuthUrl({ access_type: "offline", prompt: "consent", scope: [scope] });
+  const url = client.generateAuthUrl({ access_type: "offline", prompt: "consent", scope: scopes });
 
   const code = new Promise<string>((resolve, reject) => {
     server.on("request", (req, res) => {

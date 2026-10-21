@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import reservations from "../../../fixtures/25live/reservations.json";
+import reservations from "../../../fixtures/25live/demo/reservations.json";
 import { mapReservation } from "./map";
 import type { TwentyFiveLiveReservation } from "./types";
 

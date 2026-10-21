@@ -1,11 +1,11 @@
 import { courseLabel } from "@/services/labels";
-import { loadOccupants } from "@/services/occupancy";
+import { loadOccupants, standaloneReservations, type Occupant } from "@/services/occupancy";
 import { prisma } from "./prisma";
-import { checkCapacity, findConflicts, formatTimeRange, WEEKDAYS, type MeetingSlot, type Weekday } from "./scheduling";
+import { checkCapacity, findConflicts, formatTimeRange, WEEKDAYS, type Weekday } from "./scheduling";
 
 /** Everything the schedule views need, with conflicts and capacity issues precomputed and labeled. */
 export async function getSchedule(term?: string) {
-  const [rooms, meetings, reservations, occupants, lastSyncs] = await Promise.all([
+  const [rooms, meetings, allReservations, occupants, lastSyncs] = await Promise.all([
     prisma.room.findMany({ orderBy: { name: "asc" } }),
     prisma.meeting.findMany({
       where: term ? { course: { term } } : undefined,
@@ -17,6 +17,7 @@ export async function getSchedule(term?: string) {
     prisma.syncRun.findMany({ where: { status: "SUCCESS" }, orderBy: { finishedAt: "desc" }, distinct: ["system"] }),
   ]);
 
+  const reservations = standaloneReservations(allReservations, meetings);
   const labelById = new Map(occupants.map((o) => [o.id, o.label]));
   const roomNameById = new Map(rooms.map((r) => [r.id, r.name]));
 
@@ -36,7 +37,19 @@ export async function getSchedule(term?: string) {
   return { rooms, meetings, reservations, conflicts, conflictGroups, capacityIssues, unassigned, lastSyncs };
 }
 
+export interface ConflictSideInfo {
+  label: string;
+  kind: "course" | "reservation";
+  /** The course meeting, or every clashing date of the booking. */
+  ids: string[];
+  days: Weekday[];
+  startMinute: number;
+  endMinute: number;
+}
+
 export interface ConflictGroup {
+  key: string;
+  roomId: string;
   roomName: string;
   label: string;
   otherLabel: string;
@@ -47,24 +60,28 @@ export interface ConflictGroup {
   /** Same title at the same time: most likely the same thing booked twice. */
   duplicate: boolean;
   meetingIds: string[];
+  sides: [ConflictSideInfo, ConflictSideInfo];
 }
 
 /**
  * Calendar bookings are stored one row per date, so one recurring clash shows up once per week.
- * Collapse those into one entry per pair of bookings.
+ * Collapse those into one entry per pair of bookings (per pair of series).
  */
 function groupConflicts(
-  conflicts: { meetingId: string; otherMeetingId: string; roomName: string; label: string; otherLabel: string; days: Weekday[] }[],
-  byId: Map<string, MeetingSlot & { label: string }>,
+  conflicts: { meetingId: string; otherMeetingId: string; roomId: string; roomName: string; label: string; otherLabel: string; days: Weekday[] }[],
+  byId: Map<string, Occupant>,
 ): ConflictGroup[] {
   const groups = new Map<string, ConflictGroup>();
+  const side = (o: Occupant): ConflictSideInfo => ({ label: o.label, kind: o.kind, ids: [], days: [], startMinute: o.startMinute, endMinute: o.endMinute });
   for (const c of conflicts) {
     const a = byId.get(c.meetingId)!;
     const b = byId.get(c.otherMeetingId)!;
-    const [first, second] = a.label <= b.label ? [a, b] : [b, a];
+    const [first, second] = a.label < b.label || (a.label === b.label && a.seriesKey <= b.seriesKey) ? [a, b] : [b, a];
     const time = formatTimeRange(first.startMinute, first.endMinute);
-    const key = [c.roomName, first.label, second.label, time].join("|");
+    const key = [c.roomName, first.seriesKey, second.seriesKey, time].join("|");
     const group = groups.get(key) ?? {
+      key,
+      roomId: c.roomId,
       roomName: c.roomName,
       label: first.label,
       otherLabel: second.label,
@@ -73,8 +90,13 @@ function groupConflicts(
       dates: [],
       duplicate: first.label === second.label && first.startMinute === second.startMinute && first.endMinute === second.endMinute,
       meetingIds: [],
+      sides: [side(first), side(second)],
     };
     group.days = WEEKDAYS.filter((d) => group.days.includes(d) || c.days.includes(d));
+    for (const [s, o] of [[group.sides[0], first], [group.sides[1], second]] as const) {
+      if (!s.ids.includes(o.id)) s.ids.push(o.id);
+      s.days = WEEKDAYS.filter((d) => s.days.includes(d) || o.days.includes(d));
+    }
     const single = [a, b].find((x) => x.startDate.getTime() === x.endDate.getTime());
     if (single && !group.dates.some((d) => d.getTime() === single.startDate.getTime())) group.dates.push(single.startDate);
     group.meetingIds.push(a.id, b.id);

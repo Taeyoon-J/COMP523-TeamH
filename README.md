@@ -44,6 +44,15 @@ Other scripts: `npm test`, `npm run lint`, `npm run db:studio` (browse the DB).
   for its week, or a booking for its details.
 - **Week calendar**: the same data as a weekly calendar.
 - Bookings that a room declined in Google Calendar (struck through there) are not imported.
+- **Reserve a room**: books a room for one date or weekly, after checking it's free. Click a booking to
+  edit or cancel it.
+- **Resolve a conflict**: the Problems box (or a red booking's details) opens a dialog: keep one side and
+  move the course to a free room / cancel the booking, or replace both with a new booking.
+- Every change is written to the **events spreadsheet** (see below). Bookings that came from Google
+  Calendar are only cancelled *in this app*; their Google event belongs to someone else and is never
+  deleted. With `GOOGLE_CALENDAR_WRITE=true`, bookings made here are also added to the room's calendar.
+- Editing needs an admin. Until Google sign-in is set up, set `AUTH_DEV_ADMIN="you@unc.edu"` in `.env`
+  (development only).
 
 ## CLI
 
@@ -69,6 +78,20 @@ npm run cli -- status
 npm run cli -- reset --yes             # start over
 ```
 
+### Events spreadsheet
+
+The client keeps a Google Sheet of events. After every change (and every `pull`, `import`, `push`) the
+app rewrites an **Events** tab in it: one row per course or booking series, CSV-style columns (Event ID,
+Type, Title, Room, Days, Dates, Start, End, Description, Booked by / Instructor, Source, Status, Last
+updated).
+
+- `SHEETS_MODE="mock"` (default) writes `web/.mock-data/events-sheet.csv` instead.
+- `SHEETS_MODE="live"` writes the sheet in `GOOGLE_SHEET_ID`. Enable the **Google Sheets API** in the
+  same Cloud project, then run `npm run cli -- google login` again so the token includes spreadsheet
+  access. Your account needs edit access to the sheet.
+- `npm run cli -- sheet push` rewrites it on demand; `npm run cli -- watch` pulls from Google Calendar
+  every 5 minutes and keeps the sheet current.
+
 ### Dummy data (mock mode)
 
 By default both integrations use fake data in [`web/fixtures/`](web/fixtures/), shaped like the real
@@ -77,7 +100,13 @@ thing. Edit those JSON files to try other scenarios.
 - **Google Calendar** ([`fixtures/google-calendar/`](web/fixtures/google-calendar/)): like the department's
   setup, one calendar per room, named `FB009 seats 80` etc., plus a few non-room calendars. Writes from
   `push`/`assign` go to `web/.mock-data/google-calendar.json` (gitignored); `reset --yes` deletes it.
-- **25Live** ([`fixtures/25live/`](web/fixtures/25live/)): 10 course sections in the classrooms. Read-only.
+- **25Live** ([`fixtures/25live/`](web/fixtures/25live/)), picked with `TWENTYFIVE_LIVE_FIXTURE`:
+  - `demo`: 10 made-up course sections, for use with the mock Google Calendar.
+  - `fall2026`: 40 sections built from the course events in the real room calendars by
+    `npx tsx scripts/generate-25live-fixture.ts` (codes, rooms and times only; instructors and enrollments
+    are made up), with 3 sections deliberately put in an already-booked room. Use it with
+    `GOOGLE_CALENDAR_MODE="live"`. Calendar events like "COMP 562 - FB009 (…)" are recognized as the same
+    course, so they don't count as conflicts.
 
 Scenarios built into the data:
 

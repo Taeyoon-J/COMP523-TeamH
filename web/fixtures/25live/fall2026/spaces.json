@@ -1,0 +1,80 @@
+[
+  {
+    "space_id": 300,
+    "space_name": "FB007",
+    "building_name": "Brooks Building",
+    "max_capacity": 50
+  },
+  {
+    "space_id": 301,
+    "space_name": "FB008",
+    "building_name": "Brooks Building",
+    "max_capacity": 21
+  },
+  {
+    "space_id": 302,
+    "space_name": "FB009",
+    "building_name": "Brooks Building",
+    "max_capacity": 80
+  },
+  {
+    "space_id": 303,
+    "space_name": "SN011",
+    "building_name": "Sitterson Hall",
+    "max_capacity": 60
+  },
+  {
+    "space_id": 304,
+    "space_name": "SN014",
+    "building_name": "Sitterson Hall",
+    "max_capacity": 120
+  },
+  {
+    "space_id": 305,
+    "space_name": "SN115",
+    "building_name": "Sitterson Hall",
+    "max_capacity": 25
+  },
+  {
+    "space_id": 306,
+    "space_name": "FB120",
+    "building_name": "Brooks Building",
+    "max_capacity": 14
+  },
+  {
+    "space_id": 307,
+    "space_name": "FB141",
+    "building_name": "Brooks Building",
+    "max_capacity": 50
+  },
+  {
+    "space_id": 308,
+    "space_name": "FB152",
+    "building_name": "Brooks Building",
+    "max_capacity": 8
+  },
+  {
+    "space_id": 309,
+    "space_name": "FB220",
+    "building_name": "Brooks Building",
+    "max_capacity": 12
+  },
+  {
+    "space_id": 310,
+    "space_name": "FB252",
+    "building_name": "Brooks Building",
+    "max_capacity": 7
+  },
+  {
+    "space_id": 311,
+    "space_name": "SN282",
+    "building_name": "Sitterson Hall",
+    "max_capacity": 10
+  },
+  {
+    "space_id": 312,
+    "space_name": "SN284",
+    "building_name": "Sitterson Hall",
+    "max_capacity": 40
+  }
+]

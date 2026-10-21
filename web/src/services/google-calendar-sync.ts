@@ -5,6 +5,7 @@
 import type { Prisma, Room } from "@prisma/client";
 import { getCalendarClient, type CalendarClient } from "@/integrations/google-calendar";
 import {
+  BOOKING_KEY_PREFIX,
   eventDifferences,
   eventToSlot,
   htmlToText,
@@ -122,7 +123,11 @@ export function pullReservationsFromCalendar(window = defaultWindow()): Promise<
             roomId: room.id,
             title,
             description: htmlToText(event.description)?.slice(0, 4000) ?? null,
-            organizer: event.organizer?.displayName ?? event.organizer?.email ?? event.creator?.email ?? null,
+            // When the room calendar itself is the organizer, the person is whoever created the event.
+            organizer:
+              (event.organizer?.self || event.organizer?.email === room.googleCalendarId
+                ? (event.creator?.displayName ?? event.creator?.email)
+                : (event.organizer?.displayName ?? event.organizer?.email)) ?? null,
             htmlLink: event.htmlLink ?? null,
             ...slot,
             source: "GOOGLE_CALENDAR",
@@ -134,10 +139,28 @@ export function pullReservationsFromCalendar(window = defaultWindow()): Promise<
         result.perRoom.push({ room: room.name, count });
       }
 
-      // Reservations are a mirror of the calendars, so replace them wholesale.
+      // Mirror the calendars: add new events, update changed ones, drop ones that are gone. Rows are
+      // updated in place so a booking cancelled in this app stays cancelled, and keeps its history.
+      const existing = await prisma.roomReservation.findMany({ where: { source: "GOOGLE_CALENDAR" } });
+      const key = (r: { roomId: string; externalId: string }) => `${r.roomId}|${r.externalId}`;
+      const byKey = new Map(existing.map((r) => [key(r), r]));
+      const seen = new Set(rows.map(key));
+      const fields = ["title", "description", "organizer", "htmlLink", "startMinute", "endMinute"] as const;
+      const changed = rows.filter((row) => {
+        const old = byKey.get(key(row));
+        if (!old) return false;
+        return (
+          fields.some((f) => (old[f] ?? null) !== (row[f] ?? null)) ||
+          old.days.join() !== (row.days as string[]).join() ||
+          old.startDate.getTime() !== (row.startDate as Date).getTime() ||
+          old.endDate.getTime() !== (row.endDate as Date).getTime()
+        );
+      });
       await prisma.$transaction([
-        prisma.roomReservation.deleteMany({ where: { source: "GOOGLE_CALENDAR" } }),
-        prisma.roomReservation.createMany({ data: rows, skipDuplicates: true }),
+        prisma.roomReservation.deleteMany({ where: { id: { in: existing.filter((r) => !seen.has(key(r))).map((r) => r.id) } } }),
+        prisma.roomReservation.createMany({ data: rows.filter((row) => !byKey.has(key(row))), skipDuplicates: true }),
+        ...changed.map((row) => prisma.roomReservation.update({ where: { id: byKey.get(key(row))!.id }, data: row })),
+        prisma.roomReservation.updateMany({ where: { source: "GOOGLE_CALENDAR" }, data: { lastSyncedAt: now } }),
       ]);
       result.reservations = rows.length;
       return result;
@@ -294,7 +317,9 @@ export async function diffCalendar(): Promise<CalendarDiff> {
       const differences = eventDifferences(actual.event, meetingToEvent(toEventMeeting(m)));
       return { label, status: differences.length ? ("outdated" as const) : ("in sync" as const), differences };
     }),
-    orphaned: managed.filter((e) => !keys.has(managedKey(e.event)!)).map((e) => e.event.summary ?? e.event.id ?? "?"),
+    orphaned: managed
+      .filter((e) => !keys.has(managedKey(e.event)!) && !managedKey(e.event)!.startsWith(BOOKING_KEY_PREFIX))
+      .map((e) => e.event.summary ?? e.event.id ?? "?"),
   };
 }
 

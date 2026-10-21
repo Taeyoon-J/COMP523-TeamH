@@ -25,6 +25,16 @@ export interface CalendarItem {
   kind: "course" | "reservation";
   hasProblem: boolean;
   details: ItemDetails;
+  /** What editing and conflict resolution need. */
+  edit: {
+    title: string;
+    description: string | null;
+    roomId: string | null;
+    source: "LOCAL" | "TWENTYFIVE_LIVE" | "GOOGLE_CALENDAR";
+    /** Same for every date of one repeating calendar booking. */
+    seriesKey: string;
+    enrollment: number | null;
+  };
 }
 
 /** What the detail dialog shows; prepared on the server. */

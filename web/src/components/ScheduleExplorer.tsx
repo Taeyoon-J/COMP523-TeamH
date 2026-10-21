@@ -1,6 +1,8 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
+import type { ConflictGroup } from "@/lib/schedule-data";
 import {
   buildingName,
   DEFAULT_DURATION,
@@ -16,10 +18,15 @@ import {
   type SearchQuery,
 } from "@/lib/room-search";
 import { formatTimeRange, type Weekday } from "@/lib/scheduling";
+import BookingDialog, { type BookingDialogState } from "./BookingDialog";
+import ProblemsPanel, { type CapacityProblem } from "./ProblemsPanel";
+import ResolveDialog from "./ResolveDialog";
 import RoomTimeline from "./RoomTimeline";
 import ScheduleCalendar, { type CalendarItem } from "./ScheduleCalendar";
+import { followUps, ScheduleActionsContext, sendJson, type ScheduleActions } from "./schedule-actions";
 
 export interface ExplorerRoom {
+  id: string;
   name: string;
   capacity: number;
   category: string | null;
@@ -50,9 +57,15 @@ export default function ScheduleExplorer({
   rooms,
   items,
   range,
+  canEdit,
+  conflictGroups,
+  capacityIssues,
 }: {
   rooms: ExplorerRoom[];
   items: CalendarItem[];
+  canEdit: boolean;
+  conflictGroups: ConflictGroup[];
+  capacityIssues: CapacityProblem[];
   /** Dates checked for "every week" searches (inclusive, YYYY-MM-DD). */
   range: { from: string; to: string };
 }) {
@@ -86,10 +99,11 @@ export default function ScheduleExplorer({
     setOverrides((o) => ({ ...o, ...patch }));
 
   const busyByRoom = useMemo(() => {
-    const map = new Map<string, BusySlot[]>();
+    const map = new Map<string, (BusySlot & { id: string })[]>();
     for (const i of items) {
       if (!i.roomName) continue;
-      const slot: BusySlot = {
+      const slot = {
+        id: i.id,
         label: i.label,
         days: i.days,
         startMinute: i.startMinute,
@@ -101,6 +115,64 @@ export default function ScheduleExplorer({
     }
     return map;
   }, [items]);
+
+  // Editing: dialogs, and messages about what a change did (calendar, spreadsheet).
+  const router = useRouter();
+  const [bookingDialog, setBookingDialog] = useState<BookingDialogState | null>(null);
+  const [resolving, setResolving] = useState<ConflictGroup | null>(null);
+  const [messages, setMessages] = useState<string[]>([]);
+  const done = (lines: string[]) => {
+    setBookingDialog(null);
+    setResolving(null);
+    setMessages(lines);
+    router.refresh();
+  };
+  const actions: ScheduleActions = {
+    canEdit,
+    editBooking: (item) =>
+      setBookingDialog({
+        editingId: item.id,
+        ignoreIds: [item.id],
+        draft: {
+          title: item.edit.title,
+          description: item.edit.description ?? "",
+          roomId: item.edit.roomId ?? rooms[0]?.id ?? "",
+          startDate: item.startRecur,
+          endDate: dayBefore(item.endRecur) > item.startRecur ? dayBefore(item.endRecur) : "",
+          days: item.days,
+          startMinute: item.startMinute,
+          endMinute: item.endMinute,
+        },
+      }),
+    cancelBookings: async (ids, what) => {
+      const result = await sendJson("/api/bookings/cancel", { ids });
+      if (!result.ok) {
+        setMessages([`Not cancelled: ${result.error}`]);
+        return false;
+      }
+      done([`Cancelled ${what}.`, ...followUps(result.data)]);
+      return true;
+    },
+    resolveFor: (item) => {
+      const group = conflictGroups.find((g) => g.sides.some((s) => s.ids.includes(item.id)));
+      if (group) setResolving(group);
+      return Boolean(group);
+    },
+    seriesIds: (item) => items.filter((i) => i.kind === "reservation" && i.edit.seriesKey === item.edit.seriesKey).map((i) => i.id),
+  };
+  const newBooking = () =>
+    setBookingDialog({
+      draft: {
+        title: "",
+        description: "",
+        roomId: (selectedRoom && rooms.find((r) => r.name === selectedRoom)?.id) || rooms[0]?.id || "",
+        startDate: query.date ?? range.from,
+        endDate: "",
+        days: [],
+        startMinute: query.startMinute ?? 10 * 60,
+        endMinute: (query.startMinute ?? 10 * 60) + (query.duration ?? 60),
+      },
+    });
 
   const results = rooms
     .filter((r) => matchesRoom(r, query))
@@ -148,7 +220,21 @@ export default function ScheduleExplorer({
   const summary = `${describeQuery(query, query.date ? undefined : range.to)}${timeQuery ? ` · ${fitting} of ${results.length} free` : ` · ${results.length} rooms`}`;
 
   return (
+    <ScheduleActionsContext.Provider value={actions}>
     <div className="space-y-4">
+      <ProblemsPanel conflicts={conflictGroups} capacityIssues={capacityIssues} canEdit={canEdit} onResolve={setResolving} />
+      {messages.length > 0 && (
+        <div role="status" className="flex items-start justify-between gap-3 rounded border border-emerald-300 bg-emerald-50 p-3 text-sm text-emerald-900">
+          <ul className="space-y-0.5">
+            {messages.map((m) => (
+              <li key={m}>{m}</li>
+            ))}
+          </ul>
+          <button type="button" onClick={() => setMessages([])} className="text-emerald-800" aria-label="Dismiss">
+            ✕
+          </button>
+        </div>
+      )}
       <div ref={boxRef} className="relative">
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
           <label htmlFor="room-search" className="sr-only">
@@ -169,6 +255,11 @@ export default function ScheduleExplorer({
             className="min-w-0 flex-1 basis-80 rounded border border-zinc-300 bg-white px-3 py-2 text-sm focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-200"
             aria-controls="room-search-panel"
           />
+          {canEdit && (
+            <button type="button" onClick={newBooking} className="rounded bg-zinc-900 px-3 py-2 text-sm text-white hover:bg-zinc-700">
+              Reserve a room
+            </button>
+          )}
           {filtering && !open && (
             <p className="flex items-center gap-2 text-sm text-zinc-600">
               <span>{summary}</span>
@@ -476,7 +567,23 @@ export default function ScheduleExplorer({
           )}
         </section>
       )}
+
+      <BookingDialog state={bookingDialog} rooms={rooms} busyByRoom={busyByRoom} onClose={() => setBookingDialog(null)} onDone={done} />
+      <ResolveDialog
+        group={resolving}
+        rooms={rooms}
+        busyByRoom={busyByRoom}
+        range={range}
+        enrollmentOf={(id) => items.find((i) => i.id === id)?.edit.enrollment ?? 0}
+        onClose={() => setResolving(null)}
+        onDone={done}
+        onReplace={(state) => {
+          setResolving(null);
+          setBookingDialog(state);
+        }}
+      />
     </div>
+    </ScheduleActionsContext.Provider>
   );
 }
 

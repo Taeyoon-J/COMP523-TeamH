@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { CalendarItem } from "./ScheduleCalendar";
+import { useScheduleActions } from "./schedule-actions";
 
 /** Details for one course meeting or room booking, opened by clicking it on either view. */
 export default function DetailDialog({ item, onClose }: { item: CalendarItem | null; onClose: () => void }) {
@@ -67,8 +68,89 @@ export default function DetailDialog({ item, onClose }: { item: CalendarItem | n
               Open in Google Calendar
             </a>
           )}
+          <Actions item={item} onClose={onClose} />
         </div>
       )}
     </dialog>
+  );
+}
+
+/** Edit / cancel / resolve, for admins. Cancelling asks first, inside the dialog. */
+function Actions({ item, onClose }: { item: CalendarItem; onClose: () => void }) {
+  const actions = useScheduleActions();
+  const [confirming, setConfirming] = useState<null | "one" | "series">(null);
+  const [busy, setBusy] = useState(false);
+  const [shownFor, setShownFor] = useState(item);
+  if (item !== shownFor) {
+    setShownFor(item);
+    setConfirming(null);
+  }
+  if (!actions?.canEdit) return null;
+
+  const isBooking = item.kind === "reservation";
+  const local = item.edit.source === "LOCAL";
+  const series = isBooking ? actions.seriesIds(item) : [];
+  const cancel = async (ids: string[], what: string) => {
+    setBusy(true);
+    const ok = await actions.cancelBookings(ids, what);
+    setBusy(false);
+    if (ok) onClose();
+  };
+
+  return (
+    <div className="space-y-2 border-t border-zinc-200 pt-3">
+      <div className="flex flex-wrap gap-2">
+        {item.hasProblem && item.details.problems.some((p) => p.startsWith("Overlaps") || p.startsWith("Booked twice")) && (
+          <button
+            type="button"
+            onClick={() => {
+              if (actions.resolveFor(item)) onClose();
+            }}
+            className="rounded bg-red-700 px-3 py-1.5 text-white hover:bg-red-800"
+          >
+            Resolve conflict…
+          </button>
+        )}
+        {isBooking && local && (
+          <button
+            type="button"
+            onClick={() => {
+              actions.editBooking(item);
+              onClose();
+            }}
+            className="rounded border border-zinc-300 px-3 py-1.5 hover:bg-zinc-50"
+          >
+            Edit booking
+          </button>
+        )}
+        {isBooking && !confirming && (
+          <button type="button" onClick={() => setConfirming(series.length > 1 && !local ? "series" : "one")} className="rounded border border-zinc-300 px-3 py-1.5 text-red-700 hover:bg-red-50">
+            Cancel booking…
+          </button>
+        )}
+      </div>
+      {confirming && (
+        <div className="space-y-2 rounded border border-red-200 bg-red-50 p-3 text-red-900">
+          <p>
+            {local
+              ? "Cancel this booking? It's removed from the schedule and marked cancelled in the spreadsheet."
+              : "Cancel this booking in this app? It's marked cancelled here and in the spreadsheet. The Google Calendar event belongs to someone else and stays as it is."}
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <button type="button" disabled={busy} onClick={() => void cancel([item.id], "this date")} className="rounded bg-red-700 px-3 py-1 text-white disabled:opacity-40">
+              {local || series.length <= 1 ? "Yes, cancel it" : "Cancel this date only"}
+            </button>
+            {!local && series.length > 1 && (
+              <button type="button" disabled={busy} onClick={() => void cancel(series, `all ${series.length} dates`)} className="rounded bg-red-700 px-3 py-1 text-white disabled:opacity-40">
+                Cancel all {series.length} dates
+              </button>
+            )}
+            <button type="button" onClick={() => setConfirming(null)} className="rounded border border-red-300 px-3 py-1">
+              Keep it
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

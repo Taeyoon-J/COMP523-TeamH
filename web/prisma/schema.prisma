@@ -32,6 +32,11 @@ enum ExternalSystem {
   GOOGLE_CALENDAR
 }
 
+enum ReservationStatus {
+  ACTIVE
+  CANCELLED
+}
+
 enum SyncStatus {
   RUNNING
   SUCCESS
@@ -39,17 +44,17 @@ enum SyncStatus {
 }
 
 model Room {
-  id               String    @id @default(cuid())
-  name             String    @unique // e.g. "SN 014"
+  id               String            @id @default(cuid())
+  name             String            @unique // e.g. "SN 014"
   building         String?
   category         String? // "Classroom", "Conference Room"
   capacity         Int
   /// The room's own Google Calendar (the department keeps one calendar per room).
-  googleCalendarId String?          @unique
+  googleCalendarId String?           @unique
   meetings         Meeting[]
   reservations     RoomReservation[]
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
 }
 
 model Course {
@@ -95,23 +100,27 @@ model Meeting {
 /// A non-course booking of a room (seminar, faculty meeting, ...) pulled from Google Calendar.
 /// Counted for availability and conflict checks.
 model RoomReservation {
-  id           String     @id @default(cuid())
-  room         Room       @relation(fields: [roomId], references: [id], onDelete: Cascade)
-  roomId       String
-  title        String
-  description  String? // plain text, from the calendar event
-  organizer    String? // who booked it
-  htmlLink     String? // opens the event in Google Calendar
-  days         Weekday[]
-  startMinute  Int
-  endMinute    Int
-  startDate    DateTime   @db.Date
-  endDate      DateTime   @db.Date
-  source       DataSource @default(GOOGLE_CALENDAR)
-  externalId   String // Google Calendar event ID (one event can book several rooms)
-  lastSyncedAt DateTime?
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
+  id            String            @id @default(cuid())
+  room          Room              @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  roomId        String
+  title         String
+  description   String? // plain text, from the calendar event
+  organizer     String? // who booked it
+  htmlLink      String? // opens the event in Google Calendar
+  days          Weekday[]
+  startMinute   Int
+  endMinute     Int
+  startDate     DateTime          @db.Date
+  endDate       DateTime          @db.Date
+  source        DataSource        @default(GOOGLE_CALENDAR)
+  externalId    String // Google Calendar event ID (one event can book several rooms), or local-<id> for bookings made here
+  status        ReservationStatus @default(ACTIVE)
+  createdBy     String? // who booked it in this app
+  googleEventId String? // event this app created on the room calendar for a local booking
+  changes       ChangeLog[]
+  lastSyncedAt  DateTime?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
 
   @@unique([roomId, externalId])
   @@index([roomId])
@@ -119,15 +128,17 @@ model RoomReservation {
 
 /// FR-13 / NFR-9: history of scheduling changes.
 model ChangeLog {
-  id        String     @id @default(cuid())
-  meeting   Meeting    @relation(fields: [meetingId], references: [id], onDelete: Cascade)
-  meetingId String
-  field     String
-  oldValue  String?
-  newValue  String?
-  changedBy String // user email or system name
-  source    DataSource @default(LOCAL)
-  createdAt DateTime   @default(now())
+  id            String           @id @default(cuid())
+  meeting       Meeting?         @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  meetingId     String?
+  reservation   RoomReservation? @relation(fields: [reservationId], references: [id], onDelete: Cascade)
+  reservationId String?
+  field         String
+  oldValue      String?
+  newValue      String?
+  changedBy     String // user email or system name
+  source        DataSource       @default(LOCAL)
+  createdAt     DateTime         @default(now())
 }
 
 /// I-8: record of each sync with an external system, for "last synced" display.

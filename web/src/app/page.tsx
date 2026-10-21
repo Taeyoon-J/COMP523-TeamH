@@ -1,7 +1,8 @@
-import { auth, isAdmin, signIn, signOut } from "@/auth";
+import { auth, devAdmin, isAdmin, signIn, signOut } from "@/auth";
 import type { CalendarItem } from "@/components/ScheduleCalendar";
 import ScheduleExplorer from "@/components/ScheduleExplorer";
 import { getSchedule } from "@/lib/schedule-data";
+import { seriesId } from "@/lib/sheet-rows";
 import { formatDays, formatMinute, formatTimeRange } from "@/lib/scheduling";
 
 export const dynamic = "force-dynamic";
@@ -17,6 +18,8 @@ function searchRange(items: CalendarItem[]): { from: string; to: string } {
 export default async function Home() {
   const [session, schedule] = await Promise.all([auth(), getSchedule()]);
   const { rooms, meetings, reservations, conflicts, conflictGroups, capacityIssues, lastSyncs } = schedule;
+  const dev = devAdmin();
+  const canEdit = Boolean(dev) || isAdmin(session?.user?.email);
 
   const problemIds = new Set([...conflicts.flatMap((c) => [c.meetingId, c.otherMeetingId]), ...capacityIssues.map((c) => c.meetingId)]);
   const lastSynced = (system: string) => lastSyncs.find((s) => s.system === system)?.finishedAt?.toLocaleString() ?? "never";
@@ -63,6 +66,14 @@ export default async function Home() {
         description: null,
         link: null,
       },
+      edit: {
+        title: m.course.title,
+        description: null,
+        roomId: m.roomId,
+        source: m.source,
+        seriesKey: m.id,
+        enrollment: m.course.expectedEnrollment,
+      },
     })),
     ...reservations.map((r) => {
       const oneDay = r.startDate.getTime() === r.endDate.getTime();
@@ -79,18 +90,26 @@ export default async function Home() {
         hasProblem: problemIds.has(r.id),
         details: {
           title: r.title,
-          kindLabel: "Room booking",
+          kindLabel: r.source === "LOCAL" ? "Room booking (this app)" : "Room booking",
           rows: [
             { label: "When", value: `${oneDay ? day(r.startDate) : `Every ${formatDays(r.days)}`} · ${formatTimeRange(r.startMinute, r.endMinute)}` },
             ...(oneDay ? [] : [{ label: "Dates", value: `${day(r.startDate)} – ${day(r.endDate)}` }]),
             { label: "Room", value: `${r.room.name} (${r.room.capacity} seats)` },
-            { label: "Booked by", value: r.organizer ?? "—" },
-            { label: "Source", value: "Google Calendar" },
+            { label: "Booked by", value: r.organizer ?? r.createdBy ?? "—" },
+            { label: "Source", value: r.source === "LOCAL" ? "Booked in this app" : "Google Calendar" },
             { label: "Last synced", value: synced(r.lastSyncedAt) },
           ],
           problems: problems(r.id),
           description: r.description,
           link: r.htmlLink,
+        },
+        edit: {
+          title: r.title,
+          description: r.description,
+          roomId: r.roomId,
+          source: r.source,
+          seriesKey: `${r.roomId}|${seriesId(r.externalId)}`,
+          enrollment: null,
         },
       };
     }),
@@ -105,7 +124,9 @@ export default async function Home() {
             Last synced — 25Live: {lastSynced("TWENTYFIVE_LIVE")} · Google Calendar: {lastSynced("GOOGLE_CALENDAR")}
           </p>
         </div>
-        {session?.user ? (
+        {dev ? (
+          <span className="rounded bg-amber-100 px-2 py-1 text-xs text-amber-900">Dev admin: {dev}</span>
+        ) : session?.user ? (
           <form action={async () => { "use server"; await signOut(); }}>
             <span className="mr-3 text-sm">
               {session.user.email} {isAdmin(session.user.email) ? "(admin)" : "(view only)"}
@@ -119,29 +140,12 @@ export default async function Home() {
         )}
       </header>
 
-      {(conflicts.length > 0 || capacityIssues.length > 0) && (
-        <section className="rounded border border-red-300 bg-red-50 p-4 text-sm text-red-900">
-          <h2 className="mb-2 font-semibold">Problems</h2>
-          <ul className="list-disc space-y-1 pl-5">
-            {conflictGroups.map((g) => (
-              <li key={`${g.roomName}-${g.label}-${g.otherLabel}-${g.time}`}>
-                {g.duplicate ? `Booked twice in ${g.roomName}: ${g.label}` : `Room conflict in ${g.roomName}: ${g.label} and ${g.otherLabel}`} ·{" "}
-                {g.days.join(", ")} {g.time}
-                {g.dates.length > 0 && ` · ${g.dates.length === 1 ? g.dates[0].toISOString().slice(0, 10) : `${g.dates.length} dates`}`}
-              </li>
-            ))}
-            {capacityIssues.map((c) => (
-              <li key={c.meetingId}>
-                {c.label} expects {c.expectedEnrollment} students but {c.roomName} seats {c.capacity}
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
-
       <section>
         <ScheduleExplorer
-          rooms={rooms.map((r) => ({ name: r.name, capacity: r.capacity, category: r.category }))}
+          canEdit={canEdit}
+          conflictGroups={conflictGroups}
+          capacityIssues={capacityIssues.map((c) => ({ meetingId: c.meetingId, label: c.label, roomName: c.roomName, capacity: c.capacity, expectedEnrollment: c.expectedEnrollment }))}
+          rooms={rooms.map((r) => ({ id: r.id, name: r.name, capacity: r.capacity, category: r.category }))}
           items={items}
           range={searchRange(items)}
         />

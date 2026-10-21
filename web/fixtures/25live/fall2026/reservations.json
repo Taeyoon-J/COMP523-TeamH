@@ -1,0 +1,762 @@
+[
+  {
+    "reservation_id": "F-0001",
+    "event_name": "COMP 89-001: First-Year Seminar",
+    "subject": "COMP",
+    "catalog_number": "89",
+    "section": "001",
+    "title": "First-Year Seminar",
+    "instructor": "Instructor A",
+    "expected_head_count": 19,
+    "space_id": 305,
+    "meeting_pattern": {
+      "days": "TR",
+      "start_time": "12:30",
+      "end_time": "13:45"
+    },
+    "term_code": "2026FA",
+    "start_date": "2026-08-18",
+    "end_date": "2026-12-10"
+  },
+  {
+    "reservation_id": "F-0002",
+    "event_name": "COMP 89-001: First-Year Seminar",
+    "subject": "COMP",
+    "catalog_number": "89",
+    "section": "001",
+    "title": "First-Year Seminar",
+    "instructor": "Instructor B",
+    "expected_head_count": 19,
+    "space_id": 305,
+    "meeting_pattern": {
+      "days": "TR",
+      "start_time": "14:00",
+      "end_time": "15:15"
+    },
+    "term_code": "2026FA",
+    "start_date": "2026-08-18",
+    "end_date": "2026-12-10"
+  },
+  {
+    "reservation_id": "F-0003",
+    "event_name": "COMP 89H-001: (course title not in sample data)",
+    "subject": "COMP",
+    "catalog_number": "89H",
+    "section": "001",
+    "title": "(course title not in sample data)",
+    "instructor": "Instructor C",
+    "expected_head_count": 15,
+    "space_id": 305,
+    "meeting_pattern": {
+      "days": "TR",
+      "start_time": "15:30",
+      "end_time": "16:45"
+    },
+    "term_code": "2026FA",
+    "start_date": "2026-08-18",
+    "end_date": "2026-12-10"
+  },
+  {
+    "reservation_id": "F-0004",
+    "event_name": "COMP 116-001: (course title not in sample data)",
+    "subject": "COMP",
+    "catalog_number": "116",
+    "section": "001",
+    "title": "(course title not in sample data)",
+    "instructor": "Instructor D",
+    "expected_head_count": 48,
+    "space_id": 303,
+    "meeting_pattern": {
+      "days": "TR",
+      "start_time": "08:00",
+      "end_time": "09:15"
+    },
+    "term_code": "2026FA",
+    "start_date": "2026-08-18",
+    "end_date": "2026-12-10"
+  },
+  {
+    "reservation_id": "F-0005",
+    "event_name": "COMP 126-001: (course title not in sample data)",
+    "subject": "COMP",
+    "catalog_number": "126",
+    "section": "001",
+    "title": "(course title not in sample data)",
+    "instructor": "Instructor E",
+    "expected_head_count": 96,
+    "space_id": 304,
+    "meeting_pattern": {
+      "days": "TR",
+      "start_time": "14:00",
+      "end_time": "15:15"
+    },
+    "term_code": "2026FA",
+    "start_date": "2026-08-18",
+    "end_date": "2026-12-10"
+  },
+  {
+    "reservation_id": "F-0006",
+    "event_name": "COMP 227-001: (course title not in sample data)",
+    "subject": "COMP",
+    "catalog_number": "227",
+    "section": "001",
+    "title": "(course title not in sample data)",
+    "instructor": "Instructor F",
+    "expected_head_count": 53,
+    "space_id": 303,
+    "meeting_pattern": {
+      "days": "TR",
+      "start_time": "12:30",
+      "end_time": "13:45"
+    },
+    "term_code": "2026FA",
+    "start_date": "2026-08-18",
+    "end_date": "2026-12-10"
+  },
+  {
+    "reservation_id": "F-0007",
+    "event_name": "COMP 311-001: Computer Organization",
+    "subject": "COMP",
+    "catalog_number": "311",
+    "section": "001",
+    "title": "Computer Organization",
+    "instructor": "Instructor G",
+    "expected_head_count": 67,
+    "space_id": 304,
+    "meeting_pattern": {
+      "days": "TR",
+      "start_time": "15:30",
+      "end_time": "16:45"
+    },
+    "term_code": "2026FA",
+    "start_date": "2026-08-18",
+    "end_date": "2026-12-10"
+  },
+  {
+    "reservation_id": "F-0008",
+    "event_name": "COMP 421-001: Files and Databases",
+    "subject": "COMP",
+    "catalog_number": "421",
+    "section": "001",
+    "title": "Files and Databases",
+    "instructor": "Instructor H",
+    "expected_head_count": 78,
+    "space_id": 304,
+    "meeting_pattern": {
+      "days": "MW",
+      "start_time": "11:15",
+      "end_time": "12:30"
+    },
+    "term_code": "2026FA",
+    "start_date": "2026-08-18",
+    "end_date": "2026-12-09"
+  },
+  {
+    "reservation_id": "F-0009",
+    "event_name": "COMP 426-001: Modern Web Programming",
+    "subject": "COMP",
+    "catalog_number": "426",
+    "section": "001",
+    "title": "Modern Web Programming",
+    "instructor": "Instructor I",
+    "expected_head_count": 78,
+    "space_id": 304,
+    "meeting_pattern": {
+      "days": "MW",
+      "start_time": "15:35",
+      "end_time": "16:50"
+    },
+    "term_code": "2026FA",
+    "start_date": "2026-08-18",
+    "end_date": "2026-12-09"
+  },
+  {
+    "reservation_id": "F-0010",
+    "event_name": "COMP 433-001: Mobile Computing Systems",
+    "subject": "COMP",
+    "catalog_number": "433",
+    "section": "001",
+    "title": "Mobile Computing Systems",
+    "instructor": "Instructor J",
+    "expected_head_count": 78,
+    "space_id": 304,
+    "meeting_pattern": {
+      "days": "TR",
+      "start_time": "11:00",
+      "end_time": "12:15"
+    },
+    "term_code": "2026FA",
+    "start_date": "2026-08-18",
+    "end_date": "2026-12-10"
+  },
+  {
+    "reservation_id": "F-0011",
+    "event_name": "COMP 455-002: Models of Languages and Computation",
+    "subject": "COMP",
+    "catalog_number": "455",
+    "section": "002",
+    "title": "Models of Languages and Computation",
+    "instructor": "Instructor K",
+    "expected_head_count": 79,
+    "space_id": 304,
+    "meeting_pattern": {
+      "days": "TR",
+      "start_time": "09:30",
+      "end_time": "10:45"
+    },
+    "term_code": "2026FA",
+    "start_date": "2026-08-18",
+    "end_date": "2026-12-10"
+  },
+  {
+    "reservation_id": "F-0012",
+    "event_name": "COMP 475-001: (course title not in sample data)",
+    "subject": "COMP",
+    "catalog_number": "475",
+    "section": "001",
+    "title": "(course title not in sample data)",
+    "instructor": "Instructor L",
+    "expected_head_count": 79,
+    "space_id": 304,
+    "meeting_pattern": {
+      "days": "MW",
+      "start_time": "09:05",
+      "end_time": "10:20"
+    },
+    "term_code": "2026FA",
+    "start_date": "2026-08-18",
+    "end_date": "2026-12-09"
+  },
+  {
+    "reservation_id": "F-0013",
+    "event_name": "COMP 520-001: Compilers",
+    "subject": "COMP",
+    "catalog_number": "520",
+    "section": "001",
+    "title": "Compilers",
+    "instructor": "Instructor M",
+    "expected_head_count": 58,
+    "space_id": 302,
+    "meeting_pattern": {
+      "days": "MW",
+      "start_time": "11:15",
+      "end_time": "12:30"
+    },
+    "term_code": "2026FA",
+    "start_date": "2026-08-18",
+    "end_date": "2027-02-03"
+  },
+  {
+    "reservation_id": "F-0014",
+    "event_name": "COMP 523-001: Software Engineering Laboratory",
+    "subject": "COMP",
+    "catalog_number": "523",
+    "section": "001",
+    "title": "Software Engineering Laboratory",
+    "instructor": "Instructor N",
+    "expected_head_count": 58,
+    "space_id": 302,
+    "meeting_pattern": {
+      "days": "MW",
+      "start_time": "13:25",
+      "end_time": "14:40"
+    },
+    "term_code": "2026FA",
+    "start_date": "2026-08-18",
+    "end_date": "2026-12-09"
+  },
+  {
+    "reservation_id": "F-0015",
+    "event_name": "COMP 523-002: Software Engineering Laboratory",
+    "subject": "COMP",
+    "catalog_number": "523",
+    "section": "002",
+    "title": "Software Engineering Laboratory",
+    "instructor": "Instructor O",
+    "expected_head_count": 58,
+    "space_id": 303,
+    "meeting_pattern": {
+      "days": "MW",
+      "start_time": "15:35",
+      "end_time": "16:50"
+    },
+    "term_code": "2026FA",
+    "start_date": "2026-08-18",
+    "end_date": "2026-12-09"
+  },
+  {
+    "reservation_id": "F-0016",
+    "event_name": "COMP 537-001: Cryptography",
+    "subject": "COMP",
+    "catalog_number": "537",
+    "section": "001",
+    "title": "Cryptography",
+    "instructor": "Instructor P",
+    "expected_head_count": 44,
+    "space_id": 303,
+    "meeting_pattern": {
+      "days": "TR",
+      "start_time": "14:00",
+      "end_time": "15:15"
+    },
+    "term_code": "2026FA",
+    "start_date": "2026-08-18",
+    "end_date": "2027-02-04"
+  },
+  {
+    "reservation_id": "F-0017",
+    "event_name": "COMP 560-001: Artificial Intelligence",
+    "subject": "COMP",
+    "catalog_number": "560",
+    "section": "001",
+    "title": "Artificial Intelligence",
+    "instructor": "Instructor Q",
+    "expected_head_count": 89,
+    "space_id": 304,
+    "meeting_pattern": {
+      "days": "TR",
+      "start_time": "17:00",
+      "end_time": "18:15"
+    },
+    "term_code": "2026FA",
+    "start_date": "2026-08-18",
+    "end_date": "2026-12-10"
+  },
+  {
+    "reservation_id": "F-0018",
+    "event_name": "COMP 562-001: Introduction to Machine Learning",
+    "subject": "COMP",
+    "catalog_number": "562",
+    "section": "001",
+    "title": "Introduction to Machine Learning",
+    "instructor": "Instructor R",
+    "expected_head_count": 59,
+    "space_id": 302,
+    "meeting_pattern": {
+      "days": "TR",
+      "start_time": "14:00",
+      "end_time": "15:15"
+    },
+    "term_code": "2026FA",
+    "start_date": "2026-08-18",
+    "end_date": "2027-02-04"
+  },
+  {
+    "reservation_id": "F-0019",
+    "event_name": "COMP 572-001: (course title not in sample data)",
+    "subject": "COMP",
+    "catalog_number": "572",
+    "section": "001",
+    "title": "(course title not in sample data)",
+    "instructor": "Instructor S",
+    "expected_head_count": 89,
+    "space_id": 304,
+    "meeting_pattern": {
+      "days": "TR",
+      "start_time": "12:30",
+      "end_time": "13:45"
+    },
+    "term_code": "2026FA",
+    "start_date": "2026-08-18",
+    "end_date": "2026-12-10"
+  },
+  {
+    "reservation_id": "F-0020",
+    "event_name": "COMP 577-001: (course title not in sample data)",
+    "subject": "COMP",
+    "catalog_number": "577",
+    "section": "001",
+    "title": "(course title not in sample data)",
+    "instructor": "Instructor T",
+    "expected_head_count": 59,
+    "space_id": 302,
+    "meeting_pattern": {
+      "days": "TR",
+      "start_time": "15:30",
+      "end_time": "16:45"
+    },
+    "term_code": "2026FA",
+    "start_date": "2026-08-18",
+    "end_date": "2026-12-10"
+  },
+  {
+    "reservation_id": "F-0021",
+    "event_name": "COMP 581-001: (course title not in sample data)",
+    "subject": "COMP",
+    "catalog_number": "581",
+    "section": "001",
+    "title": "(course title not in sample data)",
+    "instructor": "Instructor U",
+    "expected_head_count": 60,
+    "space_id": 302,
+    "meeting_pattern": {
+      "days": "TR",
+      "start_time": "09:30",
+      "end_time": "10:45"
+    },
+    "term_code": "2026FA",
+    "start_date": "2026-08-18",
+    "end_date": "2026-12-10"
+  },
+  {
+    "reservation_id": "F-0022",
+    "event_name": "COMP 590-172: Special Topics",
+    "subject": "COMP",
+    "catalog_number": "590",
+    "section": "172",
+    "title": "Special Topics",
+    "instructor": "Instructor V",
+    "expected_head_count": 37,
+    "space_id": 300,
+    "meeting_pattern": {
+      "days": "TR",
+      "start_time": "11:00",
+      "end_time": "12:15"
+    },
+    "term_code": "2026FA",
+    "start_date": "2026-08-18",
+    "end_date": "2026-12-10"
+  },
+  {
+    "reservation_id": "F-0023",
+    "event_name": "COMP 590H-001: (course title not in sample data)",
+    "subject": "COMP",
+    "catalog_number": "590H",
+    "section": "001",
+    "title": "(course title not in sample data)",
+    "instructor": "Instructor W",
+    "expected_head_count": 15,
+    "space_id": 304,
+    "meeting_pattern": {
+      "days": "MW",
+      "start_time": "09:05",
+      "end_time": "10:20"
+    },
+    "term_code": "2026FA",
+    "start_date": "2026-08-18",
+    "end_date": "2026-12-09"
+  },
+  {
+    "reservation_id": "F-0024",
+    "event_name": "COMP 664-001: (course title not in sample data)",
+    "subject": "COMP",
+    "catalog_number": "664",
+    "section": "001",
+    "title": "(course title not in sample data)",
+    "instructor": "Instructor X",
+    "expected_head_count": 66,
+    "space_id": 302,
+    "meeting_pattern": {
+      "days": "TR",
+      "start_time": "11:00",
+      "end_time": "12:15"
+    },
+    "term_code": "2026FA",
+    "start_date": "2026-08-18",
+    "end_date": "2026-12-10"
+  },
+  {
+    "reservation_id": "F-0025",
+    "event_name": "COMP 669-001: (course title not in sample data)",
+    "subject": "COMP",
+    "catalog_number": "669",
+    "section": "001",
+    "title": "(course title not in sample data)",
+    "instructor": "Instructor Y",
+    "expected_head_count": 49,
+    "space_id": 303,
+    "meeting_pattern": {
+      "days": "TR",
+      "start_time": "11:00",
+      "end_time": "12:15"
+    },
+    "term_code": "2026FA",
+    "start_date": "2026-08-18",
+    "end_date": "2026-12-10"
+  },
+  {
+    "reservation_id": "F-0026",
+    "event_name": "COMP 690-063: Special Topics",
+    "subject": "COMP",
+    "catalog_number": "690",
+    "section": "063",
+    "title": "Special Topics",
+    "instructor": "Instructor Z",
+    "expected_head_count": 66,
+    "space_id": 302,
+    "meeting_pattern": {
+      "days": "TR",
+      "start_time": "12:30",
+      "end_time": "13:45"
+    },
+    "term_code": "2026FA",
+    "start_date": "2026-08-18",
+    "end_date": "2026-12-10"
+  },
+  {
+    "reservation_id": "F-0027",
+    "event_name": "COMP 690-158: Special Topics",
+    "subject": "COMP",
+    "catalog_number": "690",
+    "section": "158",
+    "title": "Special Topics",
+    "instructor": "Instructor A1",
+    "expected_head_count": 50,
+    "space_id": 303,
+    "meeting_pattern": {
+      "days": "M",
+      "start_time": "10:10",
+      "end_time": "12:40"
+    },
+    "term_code": "2026FA",
+    "start_date": "2026-08-18",
+    "end_date": "2026-12-07"
+  },
+  {
+    "reservation_id": "F-0028",
+    "event_name": "COMP 690-175: Special Topics",
+    "subject": "COMP",
+    "catalog_number": "690",
+    "section": "175",
+    "title": "Special Topics",
+    "instructor": "Instructor B1",
+    "expected_head_count": 42,
+    "space_id": 300,
+    "meeting_pattern": {
+      "days": "MW",
+      "start_time": "13:25",
+      "end_time": "14:40"
+    },
+    "term_code": "2026FA",
+    "start_date": "2026-08-18",
+    "end_date": "2026-12-09"
+  },
+  {
+    "reservation_id": "F-0029",
+    "event_name": "COMP 690-193: Special Topics",
+    "subject": "COMP",
+    "catalog_number": "690",
+    "section": "193",
+    "title": "Special Topics",
+    "instructor": "Instructor C1",
+    "expected_head_count": 21,
+    "space_id": 305,
+    "meeting_pattern": {
+      "days": "MW",
+      "start_time": "13:25",
+      "end_time": "14:40"
+    },
+    "term_code": "2026FA",
+    "start_date": "2026-08-18",
+    "end_date": "2026-12-09"
+  },
+  {
+    "reservation_id": "F-0030",
+    "event_name": "COMP 690-204: Special Topics",
+    "subject": "COMP",
+    "catalog_number": "690",
+    "section": "204",
+    "title": "Special Topics",
+    "instructor": "Instructor D1",
+    "expected_head_count": 42,
+    "space_id": 300,
+    "meeting_pattern": {
+      "days": "TR",
+      "start_time": "17:00",
+      "end_time": "18:15"
+    },
+    "term_code": "2026FA",
+    "start_date": "2026-08-18",
+    "end_date": "2026-12-10"
+  },
+  {
+    "reservation_id": "F-0031",
+    "event_name": "COMP 750-001: (course title not in sample data)",
+    "subject": "COMP",
+    "catalog_number": "750",
+    "section": "001",
+    "title": "(course title not in sample data)",
+    "instructor": "Instructor E1",
+    "expected_head_count": 25,
+    "space_id": 300,
+    "meeting_pattern": {
+      "days": "TR",
+      "start_time": "11:00",
+      "end_time": "12:15"
+    },
+    "term_code": "2026FA",
+    "start_date": "2026-08-18",
+    "end_date": "2026-12-03"
+  },
+  {
+    "reservation_id": "F-0032",
+    "event_name": "COMP 755-001: (course title not in sample data)",
+    "subject": "COMP",
+    "catalog_number": "755",
+    "section": "001",
+    "title": "(course title not in sample data)",
+    "instructor": "Instructor F1",
+    "expected_head_count": 25,
+    "space_id": 300,
+    "meeting_pattern": {
+      "days": "TR",
+      "start_time": "12:30",
+      "end_time": "13:45"
+    },
+    "term_code": "2026FA",
+    "start_date": "2026-08-18",
+    "end_date": "2026-12-10"
+  },
+  {
+    "reservation_id": "F-0033",
+    "event_name": "COMP 776-001: (course title not in sample data)",
+    "subject": "COMP",
+    "catalog_number": "776",
+    "section": "001",
+    "title": "(course title not in sample data)",
+    "instructor": "Instructor G1",
+    "expected_head_count": 25,
+    "space_id": 300,
+    "meeting_pattern": {
+      "days": "TR",
+      "start_time": "09:30",
+      "end_time": "10:45"
+    },
+    "term_code": "2026FA",
+    "start_date": "2026-08-18",
+    "end_date": "2026-12-10"
+  },
+  {
+    "reservation_id": "F-0034",
+    "event_name": "COMP 790-173: Special Topics",
+    "subject": "COMP",
+    "catalog_number": "790",
+    "section": "173",
+    "title": "Special Topics",
+    "instructor": "Instructor H1",
+    "expected_head_count": 26,
+    "space_id": 300,
+    "meeting_pattern": {
+      "days": "MW",
+      "start_time": "11:15",
+      "end_time": "12:30"
+    },
+    "term_code": "2026FA",
+    "start_date": "2026-08-18",
+    "end_date": "2027-02-03"
+  },
+  {
+    "reservation_id": "F-0035",
+    "event_name": "COMP 790-184: Special Topics",
+    "subject": "COMP",
+    "catalog_number": "790",
+    "section": "184",
+    "title": "Special Topics",
+    "instructor": "Instructor I1",
+    "expected_head_count": 31,
+    "space_id": 303,
+    "meeting_pattern": {
+      "days": "MW",
+      "start_time": "13:25",
+      "end_time": "14:40"
+    },
+    "term_code": "2026FA",
+    "start_date": "2026-08-18",
+    "end_date": "2026-12-09"
+  },
+  {
+    "reservation_id": "F-0036",
+    "event_name": "COMP 790-191: Special Topics",
+    "subject": "COMP",
+    "catalog_number": "790",
+    "section": "191",
+    "title": "Special Topics",
+    "instructor": "Instructor J1",
+    "expected_head_count": 31,
+    "space_id": 303,
+    "meeting_pattern": {
+      "days": "TR",
+      "start_time": "09:30",
+      "end_time": "10:45"
+    },
+    "term_code": "2026FA",
+    "start_date": "2026-08-18",
+    "end_date": "2026-12-10"
+  },
+  {
+    "reservation_id": "F-0037",
+    "event_name": "COMP 790-192: Special Topics",
+    "subject": "COMP",
+    "catalog_number": "790",
+    "section": "192",
+    "title": "Special Topics",
+    "instructor": "Instructor K1",
+    "expected_head_count": 26,
+    "space_id": 300,
+    "meeting_pattern": {
+      "days": "MW",
+      "start_time": "17:05",
+      "end_time": "18:20"
+    },
+    "term_code": "2026FA",
+    "start_date": "2026-08-18",
+    "end_date": "2026-12-09"
+  },
+  {
+    "reservation_id": "F-0038",
+    "event_name": "COMP 790-194: Special Topics",
+    "subject": "COMP",
+    "catalog_number": "790",
+    "section": "194",
+    "title": "Special Topics",
+    "instructor": "Instructor L1",
+    "expected_head_count": 26,
+    "space_id": 300,
+    "meeting_pattern": {
+      "days": "TR",
+      "start_time": "15:30",
+      "end_time": "16:45"
+    },
+    "term_code": "2026FA",
+    "start_date": "2026-08-18",
+    "end_date": "2026-12-10"
+  },
+  {
+    "reservation_id": "F-0039",
+    "event_name": "COMP 790-199: Special Topics",
+    "subject": "COMP",
+    "catalog_number": "790",
+    "section": "199",
+    "title": "Special Topics",
+    "instructor": "Instructor M1",
+    "expected_head_count": 26,
+    "space_id": 300,
+    "meeting_pattern": {
+      "days": "MW",
+      "start_time": "15:35",
+      "end_time": "16:50"
+    },
+    "term_code": "2026FA",
+    "start_date": "2026-08-18",
+    "end_date": "2026-12-09"
+  },
+  {
+    "reservation_id": "F-0040",
+    "event_name": "COMP 915-001: (course title not in sample data)",
+    "subject": "COMP",
+    "catalog_number": "915",
+    "section": "001",
+    "title": "(course title not in sample data)",
+    "instructor": "Instructor N1",
+    "expected_head_count": 33,
+    "space_id": 300,
+    "meeting_pattern": {
+      "days": "F",
+      "start_time": "09:15",
+      "end_time": "12:00"
+    },
+    "term_code": "2026FA",
+    "start_date": "2026-08-18",
+    "end_date": "2026-12-11"
+  }
+]
