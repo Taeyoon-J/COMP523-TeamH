@@ -9,6 +9,7 @@ import "@fullcalendar/react/themes/classic/theme.css";
 import "@fullcalendar/react/themes/classic/palette.css";
 import { useState, useSyncExternalStore } from "react";
 import DetailDialog from "./DetailDialog";
+import { Legend, sourceColor } from "./event-style";
 
 const DAY_INDEX = { SUN: 0, MON: 1, TUE: 2, WED: 3, THU: 4, FRI: 5, SAT: 6 } as const;
 
@@ -24,6 +25,8 @@ export interface CalendarItem {
   endRecur: string;
   kind: "course" | "reservation";
   hasProblem: boolean;
+  /** Shown as a small badge; a conflict wins over a too-small room. */
+  problem: "conflict" | "capacity" | null;
   details: ItemDetails;
   /** What editing and conflict resolution need. */
   edit: {
@@ -87,10 +90,13 @@ export default function ScheduleCalendar({ items, initialDate }: { items: Calend
           endTime: hhmm(m.endMinute),
           startRecur: m.startRecur,
           endRecur: m.endRecur,
-          color: m.hasProblem ? "#dc2626" : m.kind === "reservation" ? "#71717a" : "#4b9cd3",
-          classNames: ["cursor-pointer"],
+          color: sourceColor(m),
+          className: ["cursor-pointer", m.problem && `event-${m.problem}`].filter(Boolean).join(" "),
         }))}
       />
+      <div className="mt-2">
+        <Legend />
+      </div>
       <DetailDialog item={selected} onClose={() => setSelectedId(null)} />
     </>
   );

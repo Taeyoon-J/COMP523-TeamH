@@ -27,3 +27,37 @@ table th,
 table td {
   padding: 0.5rem 0.75rem 0.5rem 0;
 }
+
+/* Week calendar: a booking with a problem keeps its source color, plus an outline and a small badge. */
+.event-conflict,
+.event-capacity {
+  position: relative;
+  padding-right: 18px;
+}
+/* !important: the calendar theme sets its own outline on events. */
+.event-conflict {
+  box-shadow: 0 0 0 2px #dc2626 !important;
+}
+.event-capacity {
+  box-shadow: 0 0 0 2px #f59e0b !important;
+}
+.event-conflict::after,
+.event-capacity::after {
+  content: "!";
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 15px;
+  height: 15px;
+  border-radius: 9999px;
+  color: #fff;
+  font: 700 10px/15px system-ui, sans-serif;
+  text-align: center;
+  box-shadow: 0 0 0 1px #fff;
+}
+.event-conflict::after {
+  background: #dc2626;
+}
+.event-capacity::after {
+  background: #f59e0b;
+}

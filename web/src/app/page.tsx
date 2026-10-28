@@ -21,7 +21,10 @@ export default async function Home() {
   const dev = devAdmin();
   const canEdit = Boolean(dev) || isAdmin(session?.user?.email);
 
-  const problemIds = new Set([...conflicts.flatMap((c) => [c.meetingId, c.otherMeetingId]), ...capacityIssues.map((c) => c.meetingId)]);
+  const conflictIds = new Set(conflicts.flatMap((c) => [c.meetingId, c.otherMeetingId]));
+  const capacityIds = new Set(capacityIssues.map((c) => c.meetingId));
+  const problemIds = new Set([...conflictIds, ...capacityIds]);
+  const problemOf = (id: string) => (conflictIds.has(id) ? ("conflict" as const) : capacityIds.has(id) ? ("capacity" as const) : null);
   const lastSynced = (system: string) => lastSyncs.find((s) => s.system === system)?.finishedAt?.toLocaleString() ?? "never";
   const endRecur = (d: Date) => new Date(d.getTime() + 86_400_000).toISOString().slice(0, 10); // exclusive
   const day = (d: Date) => d.toLocaleDateString("en-US", { timeZone: "UTC", weekday: "short", month: "short", day: "numeric", year: "numeric" });
@@ -50,6 +53,7 @@ export default async function Home() {
       endRecur: endRecur(m.endDate),
       kind: "course" as const,
       hasProblem: problemIds.has(m.id),
+      problem: problemOf(m.id),
       details: {
         title: `${m.course.code}-${m.course.section} ${m.course.title}`,
         kindLabel: "Course",
@@ -88,6 +92,7 @@ export default async function Home() {
         endRecur: endRecur(r.endDate),
         kind: "reservation" as const,
         hasProblem: problemIds.has(r.id),
+        problem: problemOf(r.id),
         details: {
           title: r.title,
           kindLabel: r.source === "LOCAL" ? "Room booking (this app)" : "Room booking",

@@ -4,6 +4,7 @@ import { useState, useSyncExternalStore } from "react";
 import { buildingName, OPEN_HOURS } from "@/lib/room-search";
 import { formatTimeRange, WEEKDAYS, type Weekday } from "@/lib/scheduling";
 import DetailDialog from "./DetailDialog";
+import { Legend, ProblemBadge, sourceColor } from "./event-style";
 import { noopSubscribe, type CalendarItem } from "./ScheduleCalendar";
 
 export interface TimelineRoom {
@@ -145,9 +146,10 @@ export default function RoomTimeline({
                           onClick={() => setSelectedId(item.id)}
                           title={`${item.label} · ${formatTimeRange(item.startMinute, item.endMinute)}`}
                           className={`absolute overflow-hidden whitespace-nowrap rounded px-1.5 text-left text-xs leading-[22px] text-white shadow-sm hover:brightness-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 ${
-                            item.hasProblem ? "bg-red-600" : item.kind === "reservation" ? "bg-zinc-500" : "bg-[#4b9cd3]"
+                            item.problem === "conflict" ? "pr-5 ring-2 ring-red-600 ring-offset-1" : item.problem === "capacity" ? "pr-5 ring-2 ring-amber-500 ring-offset-1" : ""
                           }`}
                           style={{
+                            background: sourceColor(item),
                             left: pct(item.startMinute),
                             width: `max(4px, calc(${pct(item.endMinute)} - ${pct(item.startMinute)} - 2px))`,
                             top: 5 + lane * LANE_HEIGHT,
@@ -155,6 +157,7 @@ export default function RoomTimeline({
                           }}
                         >
                           {item.label}
+                          <ProblemBadge problem={item.problem} />
                         </button>
                       ))}
                     </div>
@@ -166,9 +169,10 @@ export default function RoomTimeline({
           {rooms.length === 0 && <p className="px-3 py-6 text-sm text-zinc-500">No rooms match the search.</p>}
         </div>
       </div>
-      <p className="text-xs text-zinc-500">
-        {buildingNote(rooms)} Blue: courses · Gray: calendar bookings · Red: conflicts or too small. Click a room for its week.
-      </p>
+      <div className="space-y-1">
+        <Legend />
+        <p className="text-xs text-zinc-500">{buildingNote(rooms)} Click a room for its week, or a booking for its details.</p>
+      </div>
 
       <DetailDialog item={items.find((i) => i.id === selectedId) ?? null} onClose={() => setSelectedId(null)} />
     </div>
